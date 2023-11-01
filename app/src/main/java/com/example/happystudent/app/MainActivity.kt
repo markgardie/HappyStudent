@@ -1,4 +1,4 @@
-package com.example.happystudent
+package com.example.happystudent.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,8 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.happystudent.ui.theme.HappyStudentTheme
+import com.example.happystudent.core.theme.HappyStudentTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
