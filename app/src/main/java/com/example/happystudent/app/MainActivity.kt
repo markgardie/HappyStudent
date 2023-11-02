@@ -21,29 +21,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             HappyStudentTheme(dynamicColor = false) {
                 // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+                HappyStudentNavHost()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HappyStudentTheme {
-        Greeting("Android")
-    }
-}
