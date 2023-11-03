@@ -9,7 +9,7 @@ data class StudentEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val name: String,
-    val leaving_probability: Float,
+    val leaving_probability: Double,
     val group: String,
     val update_date: String,
     val imageUrl: String

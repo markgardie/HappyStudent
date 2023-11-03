@@ -12,7 +12,7 @@ fun NavGraphBuilder.studentListScreen(
         route = studentListRoute
     ) {
 
-        StudentListRoute(viewModel)
+        StudentListScreen(viewModel)
     }
 
 

@@ -2,6 +2,8 @@ package com.example.happystudent.feature.students
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.happystudent.core.data.di.OfflineFirstRepository
+import com.example.happystudent.core.data.di.TestRepository
 import com.example.happystudent.core.data.repository.StudentRepository
 import com.example.happystudent.core.model.Student
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StudentViewModel @Inject constructor(
+    @TestRepository
     private val repository: StudentRepository
 ): ViewModel() {
 
