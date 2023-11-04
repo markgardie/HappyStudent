@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StudentViewModel @Inject constructor(
-    @TestRepository
+    @OfflineFirstRepository
     private val repository: StudentRepository
 ): ViewModel() {
 

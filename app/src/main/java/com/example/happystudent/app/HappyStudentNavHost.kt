@@ -9,8 +9,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.happystudent.feature.students.StudentViewModel
-import com.example.happystudent.feature.students.studentListRoute
-import com.example.happystudent.feature.students.studentListScreen
+import com.example.happystudent.feature.students.navigation.navigateToList
+import com.example.happystudent.feature.students.navigation.navigateToUpsertStudent
+import com.example.happystudent.feature.students.navigation.studentListRoute
+import com.example.happystudent.feature.students.navigation.studentListScreen
+import com.example.happystudent.feature.students.navigation.upsertStudentScreen
 
 @Composable
 fun HappyStudentNavHost() {
@@ -28,7 +31,15 @@ fun HappyStudentNavHost() {
             startDestination = studentListRoute
         ) {
 
-            studentListScreen(studentViewModel)
+            studentListScreen(
+                viewModel = studentViewModel,
+                navigateToUpsert = navController::navigateToUpsertStudent
+            )
+
+            upsertStudentScreen(
+                viewModel = studentViewModel,
+                navigateToList = navController::navigateToList
+            )
 
         }
     }

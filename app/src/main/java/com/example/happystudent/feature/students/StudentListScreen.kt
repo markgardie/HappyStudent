@@ -2,6 +2,7 @@ package com.example.happystudent.feature.students
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.Person
@@ -16,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemColors
@@ -30,11 +33,13 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
 
 
 @Composable
 fun StudentListScreen(
-    viewModel: StudentViewModel
+    viewModel: StudentViewModel,
+    navigateToUpsert: (Int) -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -45,6 +50,14 @@ fun StudentListScreen(
         is StudentUiState.Success -> StudentList(
             students = (uiState as StudentUiState.Success).students
         )
+    }
+
+    Box(contentAlignment = Alignment.BottomEnd) {
+        FloatingActionButton(
+            modifier = Modifier.padding(16.dp),
+            onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
+            Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
+        }
     }
 
 }
