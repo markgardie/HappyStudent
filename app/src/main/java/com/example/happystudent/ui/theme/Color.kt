@@ -1,4 +1,4 @@
-package com.example.happystudent.core.theme
+package com.example.happystudent.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
