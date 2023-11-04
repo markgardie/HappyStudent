@@ -1,4 +1,4 @@
-package com.example.happystudent.ui.theme
+package com.example.happystudent.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
