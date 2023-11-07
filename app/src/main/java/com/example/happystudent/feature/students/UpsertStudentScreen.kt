@@ -18,9 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.Student
-import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpsertStudentScreen(
     viewModel: StudentViewModel,
@@ -66,18 +64,19 @@ fun UpsertStudentScreen(
             modifier = Modifier
                 .padding(vertical = 32.dp),
             onClick = {
-            viewModel.upsertStudent(
-                Student(
-                    name = nameText,
-                    group = groupText,
-                    leaving_probability = 0.0,
-                    update_date = "today",
-                    imageUrl = ""
+                viewModel.upsertStudent(
+                    Student(
+                        id = studentId,
+                        name = nameText,
+                        group = groupText,
+                        leaving_probability = 0.0,
+                        update_date = "today",
+                        imageUrl = ""
+                    )
                 )
-            )
-            navigateToList()
+                navigateToList()
 
-        }) {
+            }) {
             Text(text = "Зберегти")
         }
 
@@ -88,7 +87,7 @@ fun UpsertStudentScreen(
 
 fun findStudent(uiState: StudentUiState, studentId: Int): Student? {
 
-    val students = when(uiState) {
+    val students = when (uiState) {
         is StudentUiState.Success -> uiState.students
         else -> emptyList()
     }
