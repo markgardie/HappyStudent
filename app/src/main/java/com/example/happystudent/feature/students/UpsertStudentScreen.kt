@@ -53,13 +53,13 @@ fun UpsertStudentScreen(
                 .padding(vertical = 16.dp),
             value = nameText,
             onValueChange = { nameText = it },
-            label = { Text(text = "Name") }
+            label = { Text(text = "Ім'я") }
         )
 
         TextField(
             value = groupText,
             onValueChange = { groupText = it },
-            label = { Text(text = "Group") }
+            label = { Text(text = "Група") }
         )
 
         Button(
@@ -71,7 +71,7 @@ fun UpsertStudentScreen(
                     name = nameText,
                     group = groupText,
                     leaving_probability = 0.0,
-                    update_date = "today",
+                    update_date = "сьогодні",
                     imageUrl = ""
                 )
             )

@@ -175,7 +175,7 @@ fun StudentCard(
         leadingContent = {
             Icon(
                 imageVector = Icons.Filled.Person,
-                contentDescription = "Student photo"
+                contentDescription = "Фото студента"
             )
         },
         trailingContent = {
