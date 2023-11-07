@@ -10,9 +10,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 @HiltViewModel
-class SurveyViewModel(
+class SurveyViewModel @Inject constructor(
     @TestRepository
     private val repository: SurveyItemRepository
 ): ViewModel() {

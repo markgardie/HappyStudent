@@ -9,6 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.happystudent.feature.leaving_prob.SurveyViewModel
+import com.example.happystudent.feature.leaving_prob.navigation.navigateToSurvey
 import com.example.happystudent.feature.leaving_prob.navigation.surveyScreen
 import com.example.happystudent.feature.students.StudentViewModel
 import com.example.happystudent.feature.students.navigation.navigateToList
@@ -41,7 +42,8 @@ fun HappyStudentNavHost() {
 
             upsertStudentScreen(
                 viewModel = studentViewModel,
-                navigateToList = navController::navigateToList
+                navigateToList = navController::navigateToList,
+                navigateToSurvey = navController::navigateToSurvey
             )
 
             surveyScreen(

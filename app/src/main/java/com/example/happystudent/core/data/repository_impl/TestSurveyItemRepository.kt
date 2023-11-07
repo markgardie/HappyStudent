@@ -64,18 +64,14 @@ class TestSurveyItemRepository @Inject constructor(): SurveyItemRepository {
             question = "Стосунки учня з іншими дітьми в групі",
             answers = listOf("Товариські з більшістю групи", "Є декілька друзів", "Нейтральні", "Є невеликі конфлікти", "Присутні серйозні конфлікти"),
             weight = 0.01
-        ),
-
-
-
-
-
-
+        )
     )
+
+    val empty = emptyList<SurveyItem>()
 
 
     override fun getSurveyItemsStream(): Flow<List<SurveyItem>> =
         flow {
-            emit(surveyItems)
+            emit(empty)
         }
 }

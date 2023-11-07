@@ -20,7 +20,8 @@ fun NavController.navigateToUpsertStudent(studentId: Int) {
 
 fun NavGraphBuilder.upsertStudentScreen(
     viewModel: StudentViewModel,
-    navigateToList: () -> Unit
+    navigateToList: () -> Unit,
+    navigateToSurvey: () -> Unit
 ) {
 
     composable(
@@ -36,7 +37,8 @@ fun NavGraphBuilder.upsertStudentScreen(
         UpsertStudentScreen(
             viewModel = viewModel,
             navigateToList = navigateToList,
-            studentId = studentId ?: DEFAULT_STUDENT_ID
+            studentId = studentId ?: DEFAULT_STUDENT_ID,
+            navigateToSurvey = navigateToSurvey
         )
     }
 }
