@@ -7,14 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -36,7 +35,7 @@ fun SurveyScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when(uiState) {
+    when (uiState) {
         is SurveyUiState.Empty -> EmptyState()
         is SurveyUiState.Success -> Survey((uiState as SurveyUiState.Success).surveyItems)
     }
@@ -48,9 +47,23 @@ fun Survey(
     surveyItems: List<SurveyItem>
 ) {
 
-    val surveyProgress by remember {
+
+    var itemIndex by remember {
+        mutableIntStateOf(0)
+    }
+
+    var showBackButton by remember {
+        mutableStateOf(false)
+    }
+
+    var surveyProgress by remember {
         mutableFloatStateOf(0.0f)
     }
+
+    var nextText by remember {
+        mutableStateOf("Далі")
+    }
+
 
     Box(
         contentAlignment = Alignment.TopCenter
@@ -64,97 +77,115 @@ fun Survey(
         )
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    SurveyItemComponent(surveyItem = surveyItems[itemIndex])
+
+    Box(
+        contentAlignment = Alignment.BottomEnd
     ) {
-        SurveyItemComponent(surveyItems = surveyItems)
+
+        Row {
+
+            if (showBackButton) {
+                TextButton(onClick = {
+                    itemIndex--
+                    showBackButton = itemIndex != 0
+                    surveyProgress = itemIndex / surveyItems.size.toFloat()
+                    nextText = "Далі"
+                }) {
+                    Text(
+                        text = "Назад",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+
+            TextButton(onClick = {
+                if (itemIndex < surveyItems.lastIndex - 1) {
+                    itemIndex++
+                }
+                else {
+                    itemIndex = surveyItems.lastIndex
+                    nextText = "Завершити"
+                }
+
+                showBackButton = itemIndex != 0
+                surveyProgress = itemIndex / surveyItems.size.toFloat()
+
+            }) {
+                Text(
+                    text = nextText,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+
+        }
+
     }
 }
 
+
 @Composable
 fun SurveyItemComponent(
-    surveyItems: List<SurveyItem>
+    surveyItem: SurveyItem
 ) {
-
-    val itemIndex by remember {
-        mutableIntStateOf(0)
-    }
 
 
     val (selectedAnswer, onAnswerSelect) = remember {
         mutableStateOf("")
     }
 
-
-    Text(
-        text = surveyItems[itemIndex].question
-    )
-    
-    Column(modifier = Modifier
-        .selectableGroup()
-        .padding(vertical = 36.dp)
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
 
-        surveyItems[itemIndex].answers.forEach { answer ->
+        Text(
+            text = surveyItem.question,
+            style = MaterialTheme.typography.titleMedium
+        )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(
+        Column(
+            modifier = Modifier
+                .selectableGroup()
+                .padding(vertical = 36.dp)
+        ) {
+
+            surveyItem.answers.forEach { answer ->
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = (answer == selectedAnswer),
+                            onClick = { onAnswerSelect(answer) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 36.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
                         selected = (answer == selectedAnswer),
-                        onClick = { onAnswerSelect(answer) },
-                        role = Role.RadioButton
+                        onClick = null // null recommended for accessibility with screenreaders
                     )
-                    .padding(horizontal = 36.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = (answer == selectedAnswer),
-                    onClick = null // null recommended for accessibility with screenreaders
-                )
 
-                Text(
-                    text = answer,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+                    Text(
+                        text = answer,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
 
+                }
             }
+
+
         }
-        
+
     }
 
-//    LazyColumn(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(36.dp)
-//    ) {
-//
-//        items(surveyItems[itemIndex].answers) {
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Start
-//            ) {
-//
-//                RadioButton(
-//                    selected = answerSelected,
-//                    onClick = {
-//                        answerSelected = !answerSelected
-//                    }
-//                )
-//
-//                Text(text = it)
-//
-//            }
-//
-//        }
-//
-//    }
-    
+
 }
 
 @Composable
