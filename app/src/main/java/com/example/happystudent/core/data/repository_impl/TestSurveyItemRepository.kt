@@ -12,7 +12,7 @@ class TestSurveyItemRepository @Inject constructor(): SurveyItemRepository {
 
         SurveyItem(
         id = 5,
-        question = "Наскільки учню цікаво навчатись",
+        question = "Наскільки учню цікаво навчатись?",
         answers = listOf("Дуже цікаво", "Переважно цікаво", "Цікаві тільки окремі теми", "Зовсім нецікаво"),
         weight = 0.25
          ),
@@ -67,11 +67,11 @@ class TestSurveyItemRepository @Inject constructor(): SurveyItemRepository {
         )
     )
 
-    val empty = emptyList<SurveyItem>()
+    private val empty = emptyList<SurveyItem>()
 
 
     override fun getSurveyItemsStream(): Flow<List<SurveyItem>> =
         flow {
-            emit(empty)
+            emit(surveyItems)
         }
 }
