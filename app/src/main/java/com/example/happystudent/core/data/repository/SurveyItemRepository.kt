@@ -6,4 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface SurveyItemRepository {
 
     fun getSurveyItemsStream(): Flow<List<SurveyItem>>
+
+    suspend fun getSurveyItems(): List<SurveyItem>
+
 }

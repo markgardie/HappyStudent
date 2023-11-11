@@ -74,4 +74,6 @@ class TestSurveyItemRepository @Inject constructor(): SurveyItemRepository {
         flow {
             emit(surveyItems)
         }
+
+    override suspend fun getSurveyItems(): List<SurveyItem> = surveyItems
 }

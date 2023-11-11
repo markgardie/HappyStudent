@@ -29,6 +29,23 @@ class SurveyViewModel @Inject constructor(
             SurveyUiState.Empty
         )
 
+    suspend fun calculateProbability(answersIds: List<Int>): Double {
+
+        var points = 0.0
+        var maxPoints = 0.0
+
+        val surveyItems = repository.getSurveyItems()
+
+        surveyItems.forEach { item ->
+            answersIds.forEach { id ->
+                maxPoints += (item.answers.size - 1) * item.weight
+                points += id * item.weight
+            }
+        }
+
+        return points / maxPoints
+
+    }
 
 }
 
