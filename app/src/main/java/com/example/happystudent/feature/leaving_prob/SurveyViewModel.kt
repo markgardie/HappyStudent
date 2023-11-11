@@ -16,7 +16,7 @@ import javax.inject.Inject
 class SurveyViewModel @Inject constructor(
     @TestRepository
     private val repository: SurveyItemRepository
-): ViewModel() {
+) : ViewModel() {
 
     val uiState: StateFlow<SurveyUiState> = repository.getSurveyItemsStream()
         .map {
@@ -31,6 +31,7 @@ class SurveyViewModel @Inject constructor(
 
     suspend fun calculateProbability(answersIds: List<Int>): Double {
 
+
         var points = 0.0
         var maxPoints = 0.0
 
@@ -44,15 +45,14 @@ class SurveyViewModel @Inject constructor(
         }
 
         return points / maxPoints
-
     }
 
 }
 
 sealed interface SurveyUiState {
 
-    data class Success(val surveyItems: List<SurveyItem>): SurveyUiState
+    data class Success(val surveyItems: List<SurveyItem>) : SurveyUiState
 
-    object Empty: SurveyUiState
+    object Empty : SurveyUiState
 
 }
