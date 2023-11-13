@@ -31,10 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.SurveyItem
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Composable
 fun SurveyScreen(
-    viewModel: SurveyViewModel
+    viewModel: SurveyViewModel,
+    navigateBackToUpsert: (Double) -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -43,7 +46,8 @@ fun SurveyScreen(
         is SurveyUiState.Empty -> EmptyState()
         is SurveyUiState.Success -> Survey(
             surveyItems = (uiState as SurveyUiState.Success).surveyItems,
-            calculateProbability = viewModel::calculateProbability
+            calculateProbability = viewModel::calculateProbability,
+            navigateBackToUpsert = navigateBackToUpsert
         )
     }
 
@@ -52,7 +56,8 @@ fun SurveyScreen(
 @Composable
 fun Survey(
     surveyItems: List<SurveyItem>,
-    calculateProbability: suspend (List<Int>) -> Double
+    calculateProbability: suspend (List<Int>) -> Double,
+    navigateBackToUpsert: (Double) -> Unit
 ) {
 
 
@@ -81,11 +86,6 @@ fun Survey(
     }
 
     val scope = rememberCoroutineScope()
-
-    var probability by remember {
-        mutableDoubleStateOf(0.0)
-    }
-
 
     Box(
         contentAlignment = Alignment.TopCenter
@@ -138,8 +138,7 @@ fun Survey(
                 }
                 else {
                     scope.launch {
-                        probability = calculateProbability(answersIds)
-                        Log.d("Survey Screen", "$probability")
+                        navigateBackToUpsert(calculateProbability(answersIds))
                     }
                 }
 

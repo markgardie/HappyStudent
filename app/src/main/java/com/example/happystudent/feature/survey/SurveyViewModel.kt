@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import java.math.BigDecimal
+import java.math.RoundingMode
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +46,9 @@ class SurveyViewModel @Inject constructor(
             }
         }
 
-        return points / maxPoints
+        return BigDecimal(points / maxPoints * 100)
+            .setScale(2, RoundingMode.HALF_EVEN)
+            .toDouble()
     }
 
 }

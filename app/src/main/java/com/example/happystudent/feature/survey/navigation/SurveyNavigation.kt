@@ -14,7 +14,8 @@ fun NavController.navigateToSurvey() {
 }
 
 fun NavGraphBuilder.surveyScreen (
-    viewModel: SurveyViewModel
+    viewModel: SurveyViewModel,
+    navigateBackToUpsert: (Double) -> Unit
 ) {
 
     composable(
@@ -23,6 +24,7 @@ fun NavGraphBuilder.surveyScreen (
 
         SurveyScreen(
             viewModel = viewModel,
+            navigateBackToUpsert = navigateBackToUpsert
         )
     }
 }

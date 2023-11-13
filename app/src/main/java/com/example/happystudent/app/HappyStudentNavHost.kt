@@ -12,6 +12,7 @@ import com.example.happystudent.feature.survey.SurveyViewModel
 import com.example.happystudent.feature.survey.navigation.navigateToSurvey
 import com.example.happystudent.feature.survey.navigation.surveyScreen
 import com.example.happystudent.feature.students.StudentViewModel
+import com.example.happystudent.feature.students.navigation.navigateBackToUpsert
 import com.example.happystudent.feature.students.navigation.navigateToList
 import com.example.happystudent.feature.students.navigation.navigateToUpsertStudent
 import com.example.happystudent.feature.students.navigation.studentListRoute
@@ -47,7 +48,8 @@ fun HappyStudentNavHost() {
             )
 
             surveyScreen(
-                viewModel = surveyViewModel
+                viewModel = surveyViewModel,
+                navigateBackToUpsert = navController::navigateBackToUpsert
             )
 
         }

@@ -18,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
 
 @Composable
 fun UpsertStudentScreen(
     viewModel: StudentViewModel,
     studentId: Int,
+    probability: Double,
     navigateToList: () -> Unit,
     navigateToSurvey: () -> Unit
 ) {
@@ -48,7 +50,10 @@ fun UpsertStudentScreen(
         }
 
         var probabilityText by remember {
-            mutableDoubleStateOf(student?.leaving_probability ?: 0.0)
+            mutableDoubleStateOf(
+                if (probability == DEFAULT_PROBABILITY) student?.leaving_probability ?: 0.0
+                else probability
+            )
         }
 
         TextField(
