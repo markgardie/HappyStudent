@@ -1,4 +1,4 @@
-package com.example.happystudent.feature.leaving_prob
+package com.example.happystudent.feature.survey
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

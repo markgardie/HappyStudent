@@ -1,13 +1,10 @@
-package com.example.happystudent.feature.leaving_prob.navigation
+package com.example.happystudent.feature.survey.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.example.happystudent.feature.leaving_prob.SurveyScreen
-import com.example.happystudent.feature.leaving_prob.SurveyViewModel
-import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
+import com.example.happystudent.feature.survey.SurveyScreen
+import com.example.happystudent.feature.survey.SurveyViewModel
 
 
 const val surveyRoute = "survey"

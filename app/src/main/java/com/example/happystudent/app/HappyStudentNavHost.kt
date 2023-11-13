@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.happystudent.feature.leaving_prob.SurveyViewModel
-import com.example.happystudent.feature.leaving_prob.navigation.navigateToSurvey
-import com.example.happystudent.feature.leaving_prob.navigation.surveyScreen
+import com.example.happystudent.feature.survey.SurveyViewModel
+import com.example.happystudent.feature.survey.navigation.navigateToSurvey
+import com.example.happystudent.feature.survey.navigation.surveyScreen
 import com.example.happystudent.feature.students.StudentViewModel
 import com.example.happystudent.feature.students.navigation.navigateToList
 import com.example.happystudent.feature.students.navigation.navigateToUpsertStudent
