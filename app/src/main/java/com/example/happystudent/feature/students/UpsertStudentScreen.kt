@@ -51,9 +51,11 @@ fun UpsertStudentScreen(
         }
 
         var probabilityText by remember {
-            mutableDoubleStateOf(
-                if (probability == DEFAULT_PROBABILITY) student?.leaving_probability ?: 0.0
-                else probability
+            mutableStateOf(
+                if (probability == DEFAULT_PROBABILITY) {
+                    student?.leaving_probability?.toString() ?: ""
+                }
+                else probability.toString()
             )
         }
 
@@ -74,8 +76,8 @@ fun UpsertStudentScreen(
         TextField(
             modifier = Modifier
                 .padding(vertical = 16.dp),
-            value = probabilityText.toString(),
-            onValueChange ={ probabilityText = it.toDouble() },
+            value = probabilityText,
+            onValueChange ={ probabilityText = it },
             label = { Text(text = "Вірогідність відвалу") }
         )
 
@@ -94,7 +96,7 @@ fun UpsertStudentScreen(
                 Student(
                     name = nameText,
                     group = groupText,
-                    leaving_probability = probabilityText,
+                    leaving_probability = probabilityText.toDouble(),
                     update_date = "сьогодні",
                     imageUrl = ""
                 )
