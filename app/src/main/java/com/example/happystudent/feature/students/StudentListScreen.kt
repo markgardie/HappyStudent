@@ -180,7 +180,7 @@ fun StudentCard(
         },
         trailingContent = {
             Column {
-                Text(text = "${student.leaving_probability * 100}%")
+                Text(text = "${student.leaving_probability}%")
                 Text(text = student.update_date)
             }
         }

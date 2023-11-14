@@ -94,7 +94,7 @@ fun UpsertStudentScreen(
                 Student(
                     name = nameText,
                     group = groupText,
-                    leaving_probability = 0.0,
+                    leaving_probability = probabilityText,
                     update_date = "сьогодні",
                     imageUrl = ""
                 )
