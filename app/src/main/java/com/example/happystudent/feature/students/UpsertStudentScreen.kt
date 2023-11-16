@@ -5,25 +5,30 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
+
 
 @Composable
 fun UpsertStudentScreen(
     viewModel: StudentViewModel,
     studentId: Int,
-    navigateToList: () -> Unit
+    probability: Double,
+    navigateToList: () -> Unit,
+    navigateToSurvey: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -38,12 +43,21 @@ fun UpsertStudentScreen(
         verticalArrangement = Arrangement.Center
     ) {
 
-        var nameText by remember {
+        var nameText by rememberSaveable {
             mutableStateOf(student?.name ?: "")
         }
 
-        var groupText by remember {
+        var groupText by rememberSaveable {
             mutableStateOf(student?.group ?: "")
+        }
+
+        var probabilityText by remember {
+            mutableStateOf(
+                if (probability == DEFAULT_PROBABILITY) {
+                    student?.leaving_probability?.toString() ?: ""
+                }
+                else probability.toString()
+            )
         }
 
         TextField(
@@ -51,26 +65,41 @@ fun UpsertStudentScreen(
                 .padding(vertical = 16.dp),
             value = nameText,
             onValueChange = { nameText = it },
-            label = { Text(text = "Name") }
+            label = { Text(text = "Ім'я") }
         )
 
         TextField(
             value = groupText,
             onValueChange = { groupText = it },
-            label = { Text(text = "Group") }
+            label = { Text(text = "Група") }
+        )
+
+        TextField(
+            modifier = Modifier
+                .padding(vertical = 16.dp),
+            value = probabilityText,
+            onValueChange ={ probabilityText = it },
+            label = { Text(text = "Вірогідність відвалу") }
         )
 
         Button(
-            modifier = Modifier
-                .padding(vertical = 32.dp),
+            modifier = Modifier.padding(32.dp),
+            onClick = {
+                navigateToSurvey()
+            }
+        ) {
+            Text(text = "Оцінити учня")
+        }
+
+        Button(
             onClick = {
                 viewModel.upsertStudent(
                     Student(
                         id = studentId,
                         name = nameText,
                         group = groupText,
-                        leaving_probability = 0.0,
-                        update_date = "today",
+                        leaving_probability = probabilityText.toDouble(),
+                        update_date = "сьогодні",
                         imageUrl = ""
                     )
                 )

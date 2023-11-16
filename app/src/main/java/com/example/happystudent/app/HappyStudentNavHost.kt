@@ -8,7 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.happystudent.feature.survey.SurveyViewModel
+import com.example.happystudent.feature.survey.navigation.navigateToSurvey
+import com.example.happystudent.feature.survey.navigation.surveyScreen
 import com.example.happystudent.feature.students.StudentViewModel
+import com.example.happystudent.feature.students.navigation.navigateBackToUpsert
 import com.example.happystudent.feature.students.navigation.navigateToList
 import com.example.happystudent.feature.students.navigation.navigateToUpsertStudent
 import com.example.happystudent.feature.students.navigation.studentListRoute
@@ -20,6 +24,7 @@ fun HappyStudentNavHost() {
 
     val navController = rememberNavController()
     val studentViewModel: StudentViewModel = hiltViewModel()
+    val surveyViewModel: SurveyViewModel = hiltViewModel()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -38,7 +43,13 @@ fun HappyStudentNavHost() {
 
             upsertStudentScreen(
                 viewModel = studentViewModel,
-                navigateToList = navController::navigateToList
+                navigateToList = navController::navigateToList,
+                navigateToSurvey = navController::navigateToSurvey
+            )
+
+            surveyScreen(
+                viewModel = surveyViewModel,
+                navigateBackToUpsert = navController::navigateBackToUpsert
             )
 
         }

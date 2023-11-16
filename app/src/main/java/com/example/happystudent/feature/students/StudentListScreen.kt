@@ -187,12 +187,12 @@ fun StudentCard(
         leadingContent = {
             Icon(
                 imageVector = Icons.Filled.Person,
-                contentDescription = "Student photo"
+                contentDescription = "Фото студента"
             )
         },
         trailingContent = {
             Column {
-                Text(text = "${student.leaving_probability * 100}%")
+                Text(text = "${student.leaving_probability}%")
                 Text(text = student.update_date)
             }
         }
