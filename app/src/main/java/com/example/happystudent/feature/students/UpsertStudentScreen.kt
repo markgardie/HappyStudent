@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
 
+
 @Composable
 fun UpsertStudentScreen(
     viewModel: StudentViewModel,
@@ -92,18 +93,19 @@ fun UpsertStudentScreen(
 
         Button(
             onClick = {
-            viewModel.upsertStudent(
-                Student(
-                    name = nameText,
-                    group = groupText,
-                    leaving_probability = probabilityText.toDouble(),
-                    update_date = "сьогодні",
-                    imageUrl = ""
+                viewModel.upsertStudent(
+                    Student(
+                        id = studentId,
+                        name = nameText,
+                        group = groupText,
+                        leaving_probability = probabilityText.toDouble(),
+                        update_date = "сьогодні",
+                        imageUrl = ""
+                    )
                 )
-            )
-            navigateToList()
+                navigateToList()
 
-        }) {
+            }) {
             Text(text = "Зберегти")
         }
 
@@ -114,7 +116,7 @@ fun UpsertStudentScreen(
 
 fun findStudent(uiState: StudentUiState, studentId: Int): Student? {
 
-    val students = when(uiState) {
+    val students = when (uiState) {
         is StudentUiState.Success -> uiState.students
         else -> emptyList()
     }

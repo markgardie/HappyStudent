@@ -3,6 +3,7 @@ package com.example.happystudent.feature.students
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,7 +55,8 @@ fun StudentListScreen(
         is StudentUiState.Loading -> LoadingState()
         is StudentUiState.Success -> StudentList(
             students = (uiState as StudentUiState.Success).students,
-            deleteStudent = viewModel::deleteStudent
+            deleteStudent = viewModel::deleteStudent,
+            navigateToUpsert = navigateToUpsert
         )
     }
 
@@ -71,7 +73,8 @@ fun StudentListScreen(
 @Composable
 fun StudentList(
     students: List<Student>,
-    deleteStudent: (Int) -> Unit
+    deleteStudent: (Int) -> Unit,
+    navigateToUpsert: (Int) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -87,7 +90,8 @@ fun StudentList(
         ) {
             StudentDismissItem(
                 student = it,
-                deleteStudent = deleteStudent
+                deleteStudent = deleteStudent,
+                navigateToUpsert = navigateToUpsert
             )
         }
 
@@ -98,7 +102,8 @@ fun StudentList(
 @Composable
 fun StudentDismissItem(
     student: Student,
-    deleteStudent: (Int) -> Unit
+    deleteStudent: (Int) -> Unit,
+    navigateToUpsert: (Int) -> Unit
 ) {
 
     var show by remember { mutableStateOf(true) }
@@ -121,7 +126,10 @@ fun StudentDismissItem(
                 DismissBackground()
             },
             dismissContent = {
-                StudentCard(student = student)
+                StudentCard(
+                    student = student,
+                    navigateToUpsert = navigateToUpsert
+                )
             },
             directions = setOf(
                 DismissDirection.StartToEnd
@@ -159,11 +167,15 @@ fun DismissBackground() {
 
 @Composable
 fun StudentCard(
-    student: Student
+    student: Student,
+    navigateToUpsert: (Int) -> Unit
 ) {
 
 
     ListItem(
+        modifier = Modifier.clickable {
+            navigateToUpsert(student.id)
+        },
         headlineContent = {
             Text(text = student.name)
         },
