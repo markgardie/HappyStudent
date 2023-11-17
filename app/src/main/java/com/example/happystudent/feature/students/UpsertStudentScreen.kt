@@ -2,14 +2,15 @@ package com.example.happystudent.feature.students
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -82,32 +83,40 @@ fun UpsertStudentScreen(
             label = { Text(text = "Вірогідність відвалу") }
         )
 
-        Button(
-            modifier = Modifier.padding(32.dp),
-            onClick = {
-                navigateToSurvey()
-            }
+        Row(
+            modifier = Modifier.padding(vertical = 32.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = "Оцінити учня")
-        }
 
-        Button(
-            onClick = {
-                viewModel.upsertStudent(
-                    Student(
-                        id = studentId,
-                        name = nameText,
-                        group = groupText,
-                        leaving_probability = probabilityText.toDouble(),
-                        update_date = "сьогодні",
-                        imageUrl = ""
+            FilledTonalButton(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                onClick = {
+                    navigateToSurvey()
+                }
+            ) {
+                Text(text = "Оцінити учня")
+            }
+
+            Button(
+                onClick = {
+                    viewModel.upsertStudent(
+                        Student(
+                            id = studentId,
+                            name = nameText,
+                            group = groupText,
+                            leaving_probability = probabilityText.toDouble(),
+                            update_date = "сьогодні",
+                            imageUrl = ""
+                        )
                     )
-                )
-                navigateToList()
+                    navigateToList()
 
-            }) {
-            Text(text = "Зберегти")
+                }) {
+                Text(text = "Зберегти")
+            }
         }
+
+
 
 
     }

@@ -76,6 +76,7 @@ fun StudentList(
     deleteStudent: (Int) -> Unit,
     navigateToUpsert: (Int) -> Unit
 ) {
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -93,6 +94,7 @@ fun StudentList(
                 deleteStudent = deleteStudent,
                 navigateToUpsert = navigateToUpsert
             )
+
         }
 
     }
@@ -223,7 +225,7 @@ fun EmptyState() {
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text(text = "No students")
+        Text(text = "Немає учнів")
 
     }
 
