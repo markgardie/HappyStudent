@@ -3,6 +3,7 @@ package com.example.happystudent.feature.students
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
@@ -35,9 +38,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.core.theme.Green40
+import com.example.happystudent.core.theme.Red40
+import com.example.happystudent.core.theme.Yellow60
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
 import kotlinx.coroutines.delay
 
@@ -173,6 +180,13 @@ fun StudentCard(
     navigateToUpsert: (Int) -> Unit
 ) {
 
+    val color by remember {
+        mutableStateOf(
+            if (student.leaving_probability > 70) Red40
+            else if (student.leaving_probability > 40) Yellow60
+            else Green40
+        )
+    }
 
     ListItem(
         modifier = Modifier.clickable {
@@ -194,8 +208,20 @@ fun StudentCard(
         },
         trailingContent = {
             Column {
-                Text(text = "${student.leaving_probability}%")
-                Text(text = student.update_date)
+
+                Text(
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .background(
+                            color = color,
+                            shape = MaterialTheme.shapes.extraSmall
+                        ),
+                    text = "${student.leaving_probability}%",
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                Text(
+                    text = student.update_date
+                )
             }
         }
     )
