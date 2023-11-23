@@ -61,7 +61,7 @@ fun StudentListScreen(
         is StudentUiState.Empty -> EmptyState()
         is StudentUiState.Loading -> LoadingState()
         is StudentUiState.Success -> StudentList(
-            students = (uiState as StudentUiState.Success).students,
+            students = viewModel.groupByProbability((uiState as StudentUiState.Success).students),
             deleteStudent = viewModel::deleteStudent,
             navigateToUpsert = navigateToUpsert
         )
@@ -123,11 +123,11 @@ fun StudentDismissItem(
                 show = false
                 true
             } else false
-        }, positionalThreshold = { 150.dp.toPx()  }
+        }, positionalThreshold = { 150.dp.toPx() }
     )
 
     AnimatedVisibility(
-        show,exit = fadeOut(spring())
+        show, exit = fadeOut(spring())
     ) {
         SwipeToDismiss(
             state = dismissState,

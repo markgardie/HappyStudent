@@ -3,7 +3,6 @@ package com.example.happystudent.feature.students
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.happystudent.core.data.di.OfflineFirstRepository
-import com.example.happystudent.core.data.di.TestRepository
 import com.example.happystudent.core.data.repository.StudentRepository
 import com.example.happystudent.core.model.Student
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +17,7 @@ import javax.inject.Inject
 class StudentViewModel @Inject constructor(
     @OfflineFirstRepository
     private val repository: StudentRepository
-): ViewModel() {
+) : ViewModel() {
 
     val uiState: StateFlow<StudentUiState> = repository.getStudentStream()
         .map {
@@ -42,13 +41,19 @@ class StudentViewModel @Inject constructor(
             repository.deleteStudent(studentId)
         }
     }
+
+    fun groupByProbability(students: List<Student>): List<Student> {
+       return students.sortedByDescending {
+           it.leaving_probability
+       }
+    }
 }
 
 sealed interface StudentUiState {
 
-    object Loading: StudentUiState
+    object Loading : StudentUiState
 
-    object Empty: StudentUiState
+    object Empty : StudentUiState
 
-    data class Success(val students: List<Student>): StudentUiState
+    data class Success(val students: List<Student>) : StudentUiState
 }
