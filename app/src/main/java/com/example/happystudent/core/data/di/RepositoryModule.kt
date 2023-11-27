@@ -3,7 +3,6 @@ package com.example.happystudent.core.data.di
 import com.example.happystudent.core.data.repository.StudentRepository
 import com.example.happystudent.core.data.repository.SurveyItemRepository
 import com.example.happystudent.core.data.repository_impl.OfflineFirstStudentRepository
-import com.example.happystudent.core.data.repository_impl.TestStudentRepository
 import com.example.happystudent.core.data.repository_impl.TestSurveyItemRepository
 import dagger.Binds
 import dagger.Module
@@ -27,10 +26,6 @@ interface RepositoryModule {
    @OfflineFirstRepository
    @Binds
    fun bindOfflineStudentRepository(impl: OfflineFirstStudentRepository): StudentRepository
-
-   @TestRepository
-   @Binds
-   fun bindTestStudentRepository(impl: TestStudentRepository): StudentRepository
 
    @TestRepository
    @Binds
