@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.happystudent.core.data.di.OfflineFirstRepository
 import com.example.happystudent.core.data.repository.StudentRepository
+import com.example.happystudent.feature.students.model.ExpandableStudentGroup
 import com.example.happystudent.core.model.Student
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -30,9 +32,19 @@ class StudentViewModel @Inject constructor(
             StudentUiState.Loading
         )
 
+    private val _expandedGroupNames = MutableStateFlow(listOf<String>())
+    val expandedGroupNames: StateFlow<List<String>> get() = _expandedGroupNames
+
+
     fun upsertStudent(student: Student) {
+
+        val priority =
+            if (student.leaving_probability > CRITICAL_PROB) FIRST_PRIORITY
+            else if (student.leaving_probability > IMPORTANT_PROB) SECOND_PRIORITY
+            else THIRD_PRIORITY
+
         viewModelScope.launch {
-            repository.upsertStudent(student)
+            repository.upsertStudent(student.copy(priority = priority))
         }
     }
 
@@ -42,11 +54,38 @@ class StudentViewModel @Inject constructor(
         }
     }
 
-    fun groupByProbability(students: List<Student>): List<Student> {
-       return students.sortedByDescending {
-           it.leaving_probability
-       }
+    fun onCardArrowClicked(groupName: String) {
+        _expandedGroupNames.value = _expandedGroupNames.value
+            .toMutableList()
+            .also { list ->
+                if (list.contains(groupName)) list.remove(groupName) else list.add(groupName)
+            }
     }
+
+    fun groupByProbability(students: List<Student>): List<ExpandableStudentGroup> {
+
+        return students
+            .sortedByDescending { it.leaving_probability }
+            .groupBy { it.priority }
+            .map {
+                ExpandableStudentGroup(
+                    name = it.key,
+                    students = it.value
+                )
+            }
+    }
+
+    companion object {
+
+        const val CRITICAL_PROB = 70
+        const val IMPORTANT_PROB = 40
+
+        const val FIRST_PRIORITY = "Критично"
+        const val SECOND_PRIORITY = "Варті уваги"
+        const val THIRD_PRIORITY = "Задовільно"
+
+    }
+
 }
 
 sealed interface StudentUiState {

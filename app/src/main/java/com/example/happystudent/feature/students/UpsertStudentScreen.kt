@@ -106,7 +106,8 @@ fun UpsertStudentScreen(
                             group = groupText,
                             leaving_probability = probabilityText.toDouble(),
                             update_date = "сьогодні",
-                            imageUrl = ""
+                            imageUrl = "",
+                            priority = ""
                         )
                     )
                     navigateToList()
