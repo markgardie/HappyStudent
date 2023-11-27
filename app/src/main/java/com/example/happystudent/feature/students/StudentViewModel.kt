@@ -4,10 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.happystudent.core.data.di.OfflineFirstRepository
 import com.example.happystudent.core.data.repository.StudentRepository
-import com.example.happystudent.feature.students.model.ExpandableStudentGroup
+import com.example.happystudent.core.database.model.StudentGroup
 import com.example.happystudent.core.model.Student
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -32,9 +31,6 @@ class StudentViewModel @Inject constructor(
             StudentUiState.Loading
         )
 
-    private val _expandedGroupNames = MutableStateFlow(listOf<String>())
-    val expandedGroupNames: StateFlow<List<String>> get() = _expandedGroupNames
-
 
     fun upsertStudent(student: Student) {
 
@@ -54,21 +50,13 @@ class StudentViewModel @Inject constructor(
         }
     }
 
-    fun onCardArrowClicked(groupName: String) {
-        _expandedGroupNames.value = _expandedGroupNames.value
-            .toMutableList()
-            .also { list ->
-                if (list.contains(groupName)) list.remove(groupName) else list.add(groupName)
-            }
-    }
-
-    fun groupByProbability(students: List<Student>): List<ExpandableStudentGroup> {
+       fun groupByProbability(students: List<Student>): List<StudentGroup> {
 
         return students
             .sortedByDescending { it.leaving_probability }
             .groupBy { it.priority }
             .map {
-                ExpandableStudentGroup(
+                StudentGroup(
                     name = it.key,
                     students = it.value
                 )

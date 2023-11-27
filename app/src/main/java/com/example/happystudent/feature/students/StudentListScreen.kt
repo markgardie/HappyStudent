@@ -61,7 +61,7 @@ fun StudentListScreen(
         is StudentUiState.Empty -> EmptyState()
         is StudentUiState.Loading -> LoadingState()
         is StudentUiState.Success -> StudentList(
-            students = viewModel.groupByProbability((uiState as StudentUiState.Success).students),
+            students = (uiState as StudentUiState.Success).students,
             deleteStudent = viewModel::deleteStudent,
             navigateToUpsert = navigateToUpsert
         )
