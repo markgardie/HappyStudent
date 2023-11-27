@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
@@ -57,23 +59,27 @@ fun StudentListScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when (uiState) {
-        is StudentUiState.Empty -> EmptyState()
-        is StudentUiState.Loading -> LoadingState()
-        is StudentUiState.Success -> StudentList(
-            students = (uiState as StudentUiState.Success).students,
-            deleteStudent = viewModel::deleteStudent,
-            navigateToUpsert = navigateToUpsert
-        )
-    }
 
-    Box(contentAlignment = Alignment.BottomEnd) {
-        FloatingActionButton(
-            modifier = Modifier.padding(16.dp),
-            onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
+            }
+        }
+    ) { innerPadding ->
+        when (uiState) {
+            is StudentUiState.Empty -> EmptyState()
+            is StudentUiState.Loading -> LoadingState()
+            is StudentUiState.Success -> StudentList(
+                students = (uiState as StudentUiState.Success).students,
+                deleteStudent = viewModel::deleteStudent,
+                navigateToUpsert = navigateToUpsert,
+                innerPadding = innerPadding
+            )
         }
     }
+
 
 }
 
@@ -81,13 +87,14 @@ fun StudentListScreen(
 fun StudentList(
     students: List<Student>,
     deleteStudent: (Int) -> Unit,
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    innerPadding: PaddingValues
 ) {
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(innerPadding)
     ) {
 
         items(
