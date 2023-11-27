@@ -50,18 +50,16 @@ class StudentViewModel @Inject constructor(
         }
     }
 
-       fun groupByProbability(students: List<Student>): List<StudentGroup> {
+    fun filterByPriority(
+        students: List<Student>,
+        priority: String
+    ): List<Student> {
 
         return students
-            .sortedByDescending { it.leaving_probability }
-            .groupBy { it.priority }
-            .map {
-                StudentGroup(
-                    name = it.key,
-                    students = it.value
-                )
-            }
+            .filter { it.priority == priority }
     }
+
+
 
     companion object {
 
