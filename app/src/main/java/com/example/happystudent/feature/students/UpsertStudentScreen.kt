@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
-
+import com.example.happystudent.core.theme.components.NavBackTopBar
 
 @Composable
 fun UpsertStudentScreen(
@@ -29,98 +30,101 @@ fun UpsertStudentScreen(
     studentId: Int,
     probability: Double,
     navigateToList: () -> Unit,
-    navigateToSurvey: () -> Unit
+    navigateToSurvey: () -> Unit,
+    navigateBackToList: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val student = findStudent(uiState, studentId)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+    Scaffold(
+        topBar = { NavBackTopBar(navigateBackToList) }
+    ) { innerPadding ->
 
-        var nameText by rememberSaveable {
-            mutableStateOf(student?.name ?: "")
-        }
-
-        var groupText by rememberSaveable {
-            mutableStateOf(student?.group ?: "")
-        }
-
-        var probabilityText by remember {
-            mutableStateOf(
-                if (probability == DEFAULT_PROBABILITY) {
-                    student?.leaving_probability?.toString() ?: ""
-                }
-                else probability.toString()
-            )
-        }
-
-        TextField(
+        Column(
             modifier = Modifier
-                .padding(vertical = 16.dp),
-            value = nameText,
-            onValueChange = { nameText = it },
-            label = { Text(text = "Ім'я") }
-        )
-
-        TextField(
-            value = groupText,
-            onValueChange = { groupText = it },
-            label = { Text(text = "Група") }
-        )
-
-        TextField(
-            modifier = Modifier
-                .padding(vertical = 16.dp),
-            value = probabilityText,
-            onValueChange ={ probabilityText = it },
-            label = { Text(text = "Вірогідність відвалу") }
-        )
-
-        Row(
-            modifier = Modifier.padding(vertical = 32.dp),
-            horizontalArrangement = Arrangement.Center
+                .fillMaxSize()
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
 
-            FilledTonalButton(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                onClick = {
-                    navigateToSurvey()
-                }
+            var nameText by rememberSaveable {
+                mutableStateOf(student?.name ?: "")
+            }
+
+            var groupText by rememberSaveable {
+                mutableStateOf(student?.group ?: "")
+            }
+
+            var probabilityText by remember {
+                mutableStateOf(
+                    if (probability == DEFAULT_PROBABILITY) {
+                        student?.leaving_probability?.toString() ?: ""
+                    } else probability.toString()
+                )
+            }
+
+            TextField(
+                modifier = Modifier
+                    .padding(vertical = 16.dp),
+                value = nameText,
+                onValueChange = { nameText = it },
+                label = { Text(text = "Ім'я") }
+            )
+
+            TextField(
+                value = groupText,
+                onValueChange = { groupText = it },
+                label = { Text(text = "Група") }
+            )
+
+            TextField(
+                modifier = Modifier
+                    .padding(vertical = 16.dp),
+                value = probabilityText,
+                onValueChange = { probabilityText = it },
+                label = { Text(text = "Вірогідність відвалу") }
+            )
+
+            Row(
+                modifier = Modifier.padding(vertical = 32.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "Оцінити учня")
-            }
 
-            Button(
-                onClick = {
-                    viewModel.upsertStudent(
-                        Student(
-                            id = studentId,
-                            name = nameText,
-                            group = groupText,
-                            leaving_probability = probabilityText.toDouble(),
-                            update_date = "сьогодні",
-                            imageUrl = "",
-                            priority = ""
+                FilledTonalButton(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onClick = {
+                        navigateToSurvey()
+                    }
+                ) {
+                    Text(text = "Оцінити учня")
+                }
+
+                Button(
+                    onClick = {
+                        viewModel.upsertStudent(
+                            Student(
+                                id = studentId,
+                                name = nameText,
+                                group = groupText,
+                                leaving_probability = probabilityText.toDouble(),
+                                update_date = "сьогодні",
+                                imageUrl = "",
+                                priority = ""
+                            )
                         )
-                    )
-                    navigateToList()
+                        navigateToList()
 
-                }) {
-                Text(text = "Зберегти")
+                    }) {
+                    Text(text = "Зберегти")
+                }
             }
+
         }
-
-
-
-
     }
+
 
 }
 
