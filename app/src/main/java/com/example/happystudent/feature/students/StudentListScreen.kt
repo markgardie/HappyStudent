@@ -6,11 +6,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,28 +23,30 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,10 +55,15 @@ import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.theme.Green40
 import com.example.happystudent.core.theme.Red40
 import com.example.happystudent.core.theme.Yellow60
+import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
+import com.example.happystudent.feature.students.StudentViewModel.Companion.SECOND_PRIORITY
+import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentListScreen(
     viewModel: StudentViewModel,
@@ -65,10 +72,19 @@ fun StudentListScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(
         topBar = {
-            StudentListTopBar()
+            StudentListTopBar(
+                onShowBottomSheet = { show ->
+                    showBottomSheet = show
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -77,6 +93,16 @@ fun StudentListScreen(
             }
         }
     ) { innerPadding ->
+
+        FilterBottomSheet(
+            sheetState = sheetState,
+            showBottomState = showBottomSheet,
+            scope = scope,
+            onShowChange = { show ->
+                showBottomSheet = show
+            }
+        )
+
         when (uiState) {
             is StudentUiState.Empty -> EmptyState()
             is StudentUiState.Loading -> LoadingState()
@@ -94,12 +120,100 @@ fun StudentListScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StudentListTopBar() {
+fun FilterBottomSheet(
+    showBottomState: Boolean,
+    sheetState: SheetState,
+    scope: CoroutineScope,
+    onShowChange: (Boolean) -> Unit
+) {
+
+
+    if (showBottomState) {
+        ModalBottomSheet(
+            onDismissRequest = { onShowChange(false) },
+            sheetState = sheetState
+        ) {
+            PriorityChips()
+        }
+    }
+
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PriorityChips() {
+
+    var selectedFirstPriority by remember {
+        mutableStateOf(true)
+    }
+
+    var selectedSecondPriority by remember {
+        mutableStateOf(false)
+    }
+
+    var selectedThirdPriority by remember {
+        mutableStateOf(false)
+    }
+
+    Text(
+        modifier = Modifier
+            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
+        text = "Фільтр по пріоритетам"
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+
+        FilterChip(
+            selected = selectedFirstPriority,
+            onClick = {
+                selectedFirstPriority = true
+                selectedSecondPriority = false
+                selectedThirdPriority = false
+            },
+            label = { Text(text = FIRST_PRIORITY) }
+        )
+
+        FilterChip(
+            selected = selectedSecondPriority,
+            onClick = {
+                selectedFirstPriority = false
+                selectedSecondPriority = true
+                selectedThirdPriority = false
+            },
+            label = { Text(text = SECOND_PRIORITY) }
+        )
+
+        FilterChip(
+            selected = selectedThirdPriority,
+            onClick = {
+                selectedFirstPriority = false
+                selectedSecondPriority = false
+                selectedThirdPriority = true
+            },
+            label = { Text(text = THIRD_PRIORITY) }
+        )
+
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StudentListTopBar(
+    onShowBottomSheet: (Boolean) -> Unit
+) {
 
     TopAppBar(
         title = { Text(text = "Happy Student") },
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onShowBottomSheet(true) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_filter),
                     contentDescription = "Фільтр учнів"
