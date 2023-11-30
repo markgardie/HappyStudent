@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -40,6 +41,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,6 +58,8 @@ import com.example.happystudent.core.theme.Green40
 import com.example.happystudent.core.theme.Red40
 import com.example.happystudent.core.theme.Yellow60
 import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
+import com.example.happystudent.feature.students.StudentViewModel.Companion.GROUP_FILTER_TYPE
+import com.example.happystudent.feature.students.StudentViewModel.Companion.PRIORITY_FILTER_TYPE
 import com.example.happystudent.feature.students.StudentViewModel.Companion.SECOND_PRIORITY
 import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
@@ -72,8 +76,11 @@ fun StudentListScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var priority by remember {
+    var filter by remember {
         mutableStateOf(FIRST_PRIORITY)
+    }
+    var filterType by remember {
+        mutableIntStateOf(PRIORITY_FILTER_TYPE)
     }
 
     val sheetState = rememberModalBottomSheetState()
@@ -98,30 +105,45 @@ fun StudentListScreen(
         }
     ) { innerPadding ->
 
-        FilterBottomSheet(
-            sheetState = sheetState,
-            showBottomState = showBottomSheet,
-            scope = scope,
-            onShowChange = { show ->
-                showBottomSheet = show
-            },
-            onChangePriority = { newPriority ->
-                priority = newPriority
-            }
-        )
-
         when (uiState) {
             is StudentUiState.Empty -> EmptyState()
             is StudentUiState.Loading -> LoadingState()
-            is StudentUiState.Success -> StudentList(
-                students = viewModel.filterByPriority(
-                    (uiState as StudentUiState.Success).students,
-                    priority
-                ),
-                deleteStudent = viewModel::deleteStudent,
-                navigateToUpsert = navigateToUpsert,
-                innerPadding = innerPadding
-            )
+            is StudentUiState.Success -> {
+
+                FilterBottomSheet(
+                    sheetState = sheetState,
+                    showBottomState = showBottomSheet,
+                    scope = scope,
+                    onShowChange = { show ->
+                        showBottomSheet = show
+                    },
+                    onChangeFilter = { newPriority ->
+                        filter = newPriority
+                    },
+                    groups = viewModel.getGroups((uiState as StudentUiState.Success).students),
+                    onChangeGroup = { group ->
+                        filter = group
+                    },
+                    onChangeFilterType = { type ->
+                        filterType = type
+                    },
+                    filter = filter
+                )
+
+
+
+                StudentList(
+                    students = viewModel.filterStudents(
+                        students = (uiState as StudentUiState.Success).students,
+                        filterType = filterType,
+                        filter = filter
+                    ),
+                    deleteStudent = viewModel::deleteStudent,
+                    navigateToUpsert = navigateToUpsert,
+                    innerPadding = innerPadding
+                )
+
+            }
 
 
         }
@@ -137,7 +159,11 @@ fun FilterBottomSheet(
     sheetState: SheetState,
     scope: CoroutineScope,
     onShowChange: (Boolean) -> Unit,
-    onChangePriority: (String) -> Unit
+    onChangeFilter: (String) -> Unit,
+    onChangeFilterType: (Int) -> Unit,
+    onChangeGroup: (String) -> Unit,
+    groups: List<String>,
+    filter: String
 ) {
 
     if (showBottomState) {
@@ -147,10 +173,17 @@ fun FilterBottomSheet(
         ) {
 
             PriorityChips(
-                onChangePriority = onChangePriority
+                onChangeFilter = onChangeFilter,
+                onChangeFilterType = onChangeFilterType,
+                filter = filter
             )
 
-
+            GroupChips(
+                groups = groups,
+                onChangeFilterType = onChangeFilterType,
+                onChangeFilter = onChangeGroup,
+                filter = filter
+            )
         }
     }
 
@@ -160,20 +193,14 @@ fun FilterBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityChips(
-    onChangePriority: (String) -> Unit
+    onChangeFilter: (String) -> Unit,
+    onChangeFilterType: (Int) -> Unit,
+    filter: String
 ) {
 
-    var selectedFirstPriority by remember {
-        mutableStateOf(true)
-    }
-
-    var selectedSecondPriority by remember {
-        mutableStateOf(false)
-    }
-
-    var selectedThirdPriority by remember {
-        mutableStateOf(false)
-    }
+    val priorities = listOf(
+        FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
+    )
 
     Text(
         modifier = Modifier
@@ -181,7 +208,7 @@ fun PriorityChips(
         text = "Фільтр по пріоритетам"
     )
 
-    Row(
+    LazyRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, bottom = 16.dp),
@@ -189,39 +216,55 @@ fun PriorityChips(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        FilterChip(
-            selected = selectedFirstPriority,
-            onClick = {
-                selectedFirstPriority = true
-                selectedSecondPriority = false
-                selectedThirdPriority = false
-                onChangePriority(FIRST_PRIORITY)
-            },
-            label = { Text(text = FIRST_PRIORITY) }
-        )
+        items(priorities) { priority ->
+            FilterChip(
+                selected = filter == priority,
+                onClick = {
+                    onChangeFilterType(PRIORITY_FILTER_TYPE)
+                    onChangeFilter(priority)
+                },
+                label = { Text(text = priority) }
+            )
+        }
 
-        FilterChip(
-            selected = selectedSecondPriority,
-            onClick = {
-                selectedFirstPriority = false
-                selectedSecondPriority = true
-                selectedThirdPriority = false
-                onChangePriority(SECOND_PRIORITY)
-            },
-            label = { Text(text = SECOND_PRIORITY) }
-        )
 
-        FilterChip(
-            selected = selectedThirdPriority,
-            onClick = {
-                selectedFirstPriority = false
-                selectedSecondPriority = false
-                selectedThirdPriority = true
-                onChangePriority(THIRD_PRIORITY)
-            },
-            label = { Text(text = THIRD_PRIORITY) }
-        )
+    }
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GroupChips(
+    groups: List<String>,
+    onChangeFilterType: (Int) -> Unit,
+    onChangeFilter: (String) -> Unit,
+    filter: String
+) {
+
+    Text(
+        modifier = Modifier
+            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
+        text = "Фільтр по групам"
+    )
+
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(groups) { group ->
+
+            FilterChip(
+                selected = group == filter,
+                onClick = {
+                    onChangeFilterType(GROUP_FILTER_TYPE)
+                    onChangeFilter(group)
+                },
+                label = { Text(text = group) }
+            )
+        }
     }
 
 }
@@ -432,3 +475,4 @@ fun EmptyState() {
     }
 
 }
+

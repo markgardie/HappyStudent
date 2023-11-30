@@ -16,28 +16,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StudentViewModel @Inject constructor(
-    @OfflineFirstRepository
-    private val repository: StudentRepository
+    @OfflineFirstRepository private val repository: StudentRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<StudentUiState> = repository.getStudentStream()
-        .map {
-            if (it.isEmpty()) StudentUiState.Empty
-            else StudentUiState.Success(it)
-        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            StudentUiState.Loading
-        )
+    val uiState: StateFlow<StudentUiState> = repository.getStudentStream().map {
+        if (it.isEmpty()) StudentUiState.Empty
+        else StudentUiState.Success(it)
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), StudentUiState.Loading
+    )
 
 
     fun upsertStudent(student: Student) {
 
-        val priority =
-            if (student.leaving_probability > CRITICAL_PROB) FIRST_PRIORITY
-            else if (student.leaving_probability > IMPORTANT_PROB) SECOND_PRIORITY
-            else THIRD_PRIORITY
+        val priority = if (student.leaving_probability > CRITICAL_PROB) FIRST_PRIORITY
+        else if (student.leaving_probability > IMPORTANT_PROB) SECOND_PRIORITY
+        else THIRD_PRIORITY
 
         viewModelScope.launch {
             repository.upsertStudent(student.copy(priority = priority))
@@ -50,16 +44,30 @@ class StudentViewModel @Inject constructor(
         }
     }
 
-    fun filterByPriority(
+    fun filterStudents(
         students: List<Student>,
-        priority: String
-    ): List<Student> {
+        filterType: Int,
+        filter: String
+    ) =
+        if (filterType == PRIORITY_FILTER_TYPE) {
+            filterByPriority(students, filter)
+        }
+        else {
+            filterByGroup(students, filter)
+        }
 
-        return students
-            .filter { it.priority == priority }
-    }
+    private fun filterByPriority(students: List<Student>, priority: String) =
+        students.filter { it.priority == priority }
 
 
+    private fun filterByGroup(students: List<Student>, group: String) =
+        students.filter { it.group == group }
+
+    fun getGroups(students: List<Student>) =
+        students
+            .groupBy { it.group }
+            .keys
+            .toList()
 
     companion object {
 
@@ -69,6 +77,9 @@ class StudentViewModel @Inject constructor(
         const val FIRST_PRIORITY = "Критично"
         const val SECOND_PRIORITY = "Варті уваги"
         const val THIRD_PRIORITY = "Задовільно"
+
+        const val PRIORITY_FILTER_TYPE = 0
+        const val GROUP_FILTER_TYPE = 1
 
     }
 
