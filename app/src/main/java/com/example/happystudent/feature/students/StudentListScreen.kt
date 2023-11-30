@@ -75,6 +75,10 @@ fun StudentListScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    var priority by remember {
+        mutableStateOf(FIRST_PRIORITY)
+    }
+
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember {
@@ -103,6 +107,9 @@ fun StudentListScreen(
             scope = scope,
             onShowChange = { show ->
                 showBottomSheet = show
+            },
+            onChangePriority = { newPriority ->
+                priority = newPriority
             }
         )
 
@@ -110,11 +117,16 @@ fun StudentListScreen(
             is StudentUiState.Empty -> EmptyState()
             is StudentUiState.Loading -> LoadingState()
             is StudentUiState.Success -> StudentList(
-                students = (uiState as StudentUiState.Success).students,
+                students = viewModel.filterByPriority(
+                    (uiState as StudentUiState.Success).students,
+                    priority
+                ),
                 deleteStudent = viewModel::deleteStudent,
                 navigateToUpsert = navigateToUpsert,
                 innerPadding = innerPadding
             )
+
+
         }
     }
 
@@ -127,7 +139,8 @@ fun FilterBottomSheet(
     showBottomState: Boolean,
     sheetState: SheetState,
     scope: CoroutineScope,
-    onShowChange: (Boolean) -> Unit
+    onShowChange: (Boolean) -> Unit,
+    onChangePriority: (String) -> Unit
 ) {
 
     val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -140,7 +153,9 @@ fun FilterBottomSheet(
             Column(
                 modifier = Modifier.padding(bottom = bottomPadding)
             ) {
-                PriorityChips()
+                PriorityChips(
+                    onChangePriority = onChangePriority
+                )
             }
 
         }
@@ -151,7 +166,9 @@ fun FilterBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PriorityChips() {
+fun PriorityChips(
+    onChangePriority: (String) -> Unit
+) {
 
     var selectedFirstPriority by remember {
         mutableStateOf(true)
@@ -185,6 +202,7 @@ fun PriorityChips() {
                 selectedFirstPriority = true
                 selectedSecondPriority = false
                 selectedThirdPriority = false
+                onChangePriority(FIRST_PRIORITY)
             },
             label = { Text(text = FIRST_PRIORITY) }
         )
@@ -195,6 +213,7 @@ fun PriorityChips() {
                 selectedFirstPriority = false
                 selectedSecondPriority = true
                 selectedThirdPriority = false
+                onChangePriority(SECOND_PRIORITY)
             },
             label = { Text(text = SECOND_PRIORITY) }
         )
@@ -205,6 +224,7 @@ fun PriorityChips() {
                 selectedFirstPriority = false
                 selectedSecondPriority = false
                 selectedThirdPriority = true
+                onChangePriority(THIRD_PRIORITY)
             },
             label = { Text(text = THIRD_PRIORITY) }
         )
