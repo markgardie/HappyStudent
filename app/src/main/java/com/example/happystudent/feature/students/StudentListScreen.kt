@@ -41,7 +41,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,13 +52,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.R
+import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.theme.Green40
 import com.example.happystudent.core.theme.Red40
 import com.example.happystudent.core.theme.Yellow60
 import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
-import com.example.happystudent.feature.students.StudentViewModel.Companion.GROUP_FILTER_TYPE
-import com.example.happystudent.feature.students.StudentViewModel.Companion.PRIORITY_FILTER_TYPE
 import com.example.happystudent.feature.students.StudentViewModel.Companion.SECOND_PRIORITY
 import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
@@ -75,13 +73,6 @@ fun StudentListScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    var filter by remember {
-        mutableStateOf(FIRST_PRIORITY)
-    }
-    var filterType by remember {
-        mutableIntStateOf(PRIORITY_FILTER_TYPE)
-    }
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -110,6 +101,7 @@ fun StudentListScreen(
             is StudentUiState.Loading -> LoadingState()
             is StudentUiState.Success -> {
 
+
                 FilterBottomSheet(
                     sheetState = sheetState,
                     showBottomState = showBottomSheet,
@@ -117,27 +109,14 @@ fun StudentListScreen(
                     onShowChange = { show ->
                         showBottomSheet = show
                     },
-                    onChangeFilter = { newPriority ->
-                        filter = newPriority
-                    },
-                    groups = viewModel.getGroups((uiState as StudentUiState.Success).students),
-                    onChangeGroup = { group ->
-                        filter = group
-                    },
-                    onChangeFilterType = { type ->
-                        filterType = type
-                    },
-                    filter = filter
+                    groups = viewModel.getGroups(),
+                    filter = (uiState as StudentUiState.Success).filter,
+                    onUpdateFilterPreferences = viewModel::updateFilterPreferences
                 )
 
 
-
                 StudentList(
-                    students = viewModel.filterStudents(
-                        students = (uiState as StudentUiState.Success).students,
-                        filterType = filterType,
-                        filter = filter
-                    ),
+                    students = viewModel.filterStudents(),
                     deleteStudent = viewModel::deleteStudent,
                     navigateToUpsert = navigateToUpsert,
                     innerPadding = innerPadding
@@ -159,9 +138,7 @@ fun FilterBottomSheet(
     sheetState: SheetState,
     scope: CoroutineScope,
     onShowChange: (Boolean) -> Unit,
-    onChangeFilter: (String) -> Unit,
-    onChangeFilterType: (Int) -> Unit,
-    onChangeGroup: (String) -> Unit,
+    onUpdateFilterPreferences: (String, FilterType) -> Unit,
     groups: List<String>,
     filter: String
 ) {
@@ -173,15 +150,13 @@ fun FilterBottomSheet(
         ) {
 
             PriorityChips(
-                onChangeFilter = onChangeFilter,
-                onChangeFilterType = onChangeFilterType,
+                onUpdateFilterPreferences = onUpdateFilterPreferences,
                 filter = filter
             )
 
             GroupChips(
                 groups = groups,
-                onChangeFilterType = onChangeFilterType,
-                onChangeFilter = onChangeGroup,
+                onUpdateFilterPreferences = onUpdateFilterPreferences,
                 filter = filter
             )
         }
@@ -193,8 +168,7 @@ fun FilterBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityChips(
-    onChangeFilter: (String) -> Unit,
-    onChangeFilterType: (Int) -> Unit,
+    onUpdateFilterPreferences: (String, FilterType) -> Unit,
     filter: String
 ) {
 
@@ -220,8 +194,7 @@ fun PriorityChips(
             FilterChip(
                 selected = filter == priority,
                 onClick = {
-                    onChangeFilterType(PRIORITY_FILTER_TYPE)
-                    onChangeFilter(priority)
+                    onUpdateFilterPreferences(priority, FilterType.BY_PRIORITY)
                 },
                 label = { Text(text = priority) }
             )
@@ -236,8 +209,7 @@ fun PriorityChips(
 @Composable
 fun GroupChips(
     groups: List<String>,
-    onChangeFilterType: (Int) -> Unit,
-    onChangeFilter: (String) -> Unit,
+    onUpdateFilterPreferences: (String, FilterType) -> Unit,
     filter: String
 ) {
 
@@ -259,8 +231,7 @@ fun GroupChips(
             FilterChip(
                 selected = group == filter,
                 onClick = {
-                    onChangeFilterType(GROUP_FILTER_TYPE)
-                    onChangeFilter(group)
+                    onUpdateFilterPreferences(group, FilterType.BY_GROUP)
                 },
                 label = { Text(text = group) }
             )
