@@ -30,7 +30,8 @@ fun NavController.navigateBackToUpsert(probability: Double) {
 fun NavGraphBuilder.upsertStudentScreen(
     viewModel: StudentViewModel,
     navigateToList: () -> Unit,
-    navigateToSurvey: () -> Unit
+    navigateToSurvey: () -> Unit,
+    navigateBackToList: () -> Unit
 ) {
 
     composable(
@@ -49,7 +50,8 @@ fun NavGraphBuilder.upsertStudentScreen(
             navigateToList = navigateToList,
             studentId = studentId ?: DEFAULT_STUDENT_ID,
             navigateToSurvey = navigateToSurvey,
-            probability = probability ?: DEFAULT_PROBABILITY
+            probability = probability ?: DEFAULT_PROBABILITY,
+            navigateBackToList = navigateBackToList
         )
     }
 }

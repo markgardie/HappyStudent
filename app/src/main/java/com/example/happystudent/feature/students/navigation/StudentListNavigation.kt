@@ -12,6 +12,10 @@ fun NavController.navigateToList() {
     this.navigate(studentListRoute)
 }
 
+fun NavController.navigateBackToList() {
+    this.popBackStack()
+}
+
 fun NavGraphBuilder.studentListScreen(
     viewModel: StudentViewModel,
     navigateToUpsert: (Int) -> Unit
