@@ -86,8 +86,8 @@ fun StudentListScreen(
     }
 
     when (uiState) {
-        is StudentUiState.Empty -> EmptyState()
-        is StudentUiState.Loading -> LoadingState()
+        is StudentUiState.Empty -> EmptyState(navigateToUpsert = navigateToUpsert)
+        is StudentUiState.Loading -> LoadingState(navigateToUpsert = navigateToUpsert)
         is StudentUiState.Success -> {
 
             Scaffold(
@@ -435,30 +435,60 @@ fun StudentCard(
 }
 
 @Composable
-fun LoadingState() {
+fun LoadingState(
+    navigateToUpsert: (Int) -> Unit
+) {
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        CircularProgressIndicator()
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator()
+        }
     }
+
+
 
 }
 
 @Composable
-fun EmptyState() {
+fun EmptyState(
+    navigateToUpsert: (Int) -> Unit
+) {
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
 
-        Text(text = "Немає учнів")
+            Text(text = "Немає учнів")
 
+        }
     }
+
+
 
 }
 
