@@ -1,5 +1,6 @@
 package com.example.happystudent.app
 
+import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,7 +22,9 @@ import com.example.happystudent.feature.survey.navigation.navigateToSurvey
 import com.example.happystudent.feature.survey.navigation.surveyScreen
 
 @Composable
-fun HappyStudentNavHost() {
+fun HappyStudentNavHost(
+    context: Context
+) {
 
     val navController = rememberNavController()
     val studentViewModel: StudentViewModel = hiltViewModel()
@@ -39,7 +42,8 @@ fun HappyStudentNavHost() {
 
             studentListScreen(
                 viewModel = studentViewModel,
-                navigateToUpsert = navController::navigateToUpsertStudent
+                navigateToUpsert = navController::navigateToUpsertStudent,
+                context = context
             )
 
             upsertStudentScreen(

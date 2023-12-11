@@ -71,32 +71,40 @@ class StudentViewModel @Inject constructor(
     }
 
     fun filterStudents() =
-        when(uiState.value) {
+        when (uiState.value) {
             is StudentUiState.Success -> {
 
                 val students = (uiState.value as StudentUiState.Success).students
                 val filterType = (uiState.value as StudentUiState.Success).filterType
                 val filter = (uiState.value as StudentUiState.Success).filter
 
-                when(filterType) {
+                when (filterType) {
                     FilterType.BY_PRIORITY -> students.filter { it.priority == filter }
                     FilterType.BY_GROUP -> students.filter { it.group == filter }
-                    else -> { students.filter { it.priority == FIRST_PRIORITY } }
+                    else -> {
+                        students.filter { it.priority == FIRST_PRIORITY }
+                    }
                 }
             }
-            else -> { emptyList() }
+
+            else -> {
+                emptyList()
+            }
         }
 
 
     fun getGroups() =
-        when(uiState.value) {
+        when (uiState.value) {
             is StudentUiState.Success -> {
                 (uiState.value as StudentUiState.Success).students
                     .groupBy { it.group }
                     .keys
                     .toList()
             }
-            else -> { emptyList() }
+
+            else -> {
+                emptyList()
+            }
         }
 
 

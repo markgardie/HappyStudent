@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             HappyStudentTheme(dynamicColor = false) {
                 // A surface container using the 'background' color from the theme
-                HappyStudentNavHost()
+                HappyStudentNavHost(this)
             }
         }
     }

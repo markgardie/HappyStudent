@@ -1,5 +1,7 @@
 package com.example.happystudent.feature.students
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
@@ -50,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.R
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
@@ -61,6 +64,7 @@ import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRS
 import com.example.happystudent.feature.students.StudentViewModel.Companion.SECOND_PRIORITY
 import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
+import com.example.happystudent.feature.students.util.formatList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 
@@ -69,7 +73,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun StudentListScreen(
     viewModel: StudentViewModel,
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    context: Context
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -80,28 +85,28 @@ fun StudentListScreen(
         mutableStateOf(false)
     }
 
-    Scaffold(
-        topBar = {
-            StudentListTopBar(
-                onShowBottomSheet = { show ->
-                    showBottomSheet = show
+    when (uiState) {
+        is StudentUiState.Empty -> EmptyState()
+        is StudentUiState.Loading -> LoadingState()
+        is StudentUiState.Success -> {
+
+            Scaffold(
+                topBar = {
+                    StudentListTopBar(
+                        onShowBottomSheet = { show ->
+                            showBottomSheet = show
+                        },
+                        shareText = viewModel.filterStudents().formatList(),
+                        context = context
+                    )
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
+                        Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
+                    }
                 }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
-            }
-        }
-    ) { innerPadding ->
-
-        when (uiState) {
-            is StudentUiState.Empty -> EmptyState()
-            is StudentUiState.Loading -> LoadingState()
-            is StudentUiState.Success -> {
-
-
+            ) { innerPadding ->
                 FilterBottomSheet(
                     sheetState = sheetState,
                     showBottomState = showBottomSheet,
@@ -121,11 +126,12 @@ fun StudentListScreen(
                     navigateToUpsert = navigateToUpsert,
                     innerPadding = innerPadding
                 )
-
             }
 
 
         }
+
+
     }
 
 
@@ -243,8 +249,17 @@ fun GroupChips(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentListTopBar(
-    onShowBottomSheet: (Boolean) -> Unit
+    onShowBottomSheet: (Boolean) -> Unit,
+    shareText: String,
+    context: Context
 ) {
+
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, shareText)
+        type = "text/plain"
+    }
+    val shareIntent = Intent.createChooser(sendIntent, null)
 
     TopAppBar(
         title = { Text(text = "Happy Student") },
@@ -255,7 +270,7 @@ fun StudentListTopBar(
                     contentDescription = "Фільтр учнів"
                 )
             }
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { startActivity(context, shareIntent, null) }) {
                 Icon(
                     imageVector = Icons.Filled.Share,
                     contentDescription = "Поділитись списком"
