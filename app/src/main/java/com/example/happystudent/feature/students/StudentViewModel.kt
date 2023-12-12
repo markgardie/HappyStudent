@@ -81,9 +81,7 @@ class StudentViewModel @Inject constructor(
                 when (filterType) {
                     FilterType.BY_PRIORITY -> students.filter { it.priority == filter }
                     FilterType.BY_GROUP -> students.filter { it.group == filter }
-                    else -> {
-                        students.filter { it.priority == FIRST_PRIORITY }
-                    }
+                    else -> students
                 }
             }
 
@@ -113,7 +111,7 @@ class StudentViewModel @Inject constructor(
         const val CRITICAL_PROB = 70
         const val IMPORTANT_PROB = 40
 
-
+        const val DEFAULT = "Всі"
         const val FIRST_PRIORITY = "Критично"
         const val SECOND_PRIORITY = "Варті уваги"
         const val THIRD_PRIORITY = "Задовільно"
@@ -131,7 +129,7 @@ sealed interface StudentUiState {
 
     data class Success(
         val students: List<Student>,
-        val filter: String = FIRST_PRIORITY,
-        val filterType: FilterType = FilterType.BY_PRIORITY
+        val filter: String,
+        val filterType: FilterType
     ) : StudentUiState
 }

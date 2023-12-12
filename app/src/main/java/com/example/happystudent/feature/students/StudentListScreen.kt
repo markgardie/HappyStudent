@@ -60,6 +60,7 @@ import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.theme.Green40
 import com.example.happystudent.core.theme.Red40
 import com.example.happystudent.core.theme.Yellow60
+import com.example.happystudent.feature.students.StudentViewModel.Companion.DEFAULT
 import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
 import com.example.happystudent.feature.students.StudentViewModel.Companion.SECOND_PRIORITY
 import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
@@ -179,7 +180,7 @@ fun PriorityChips(
 ) {
 
     val priorities = listOf(
-        FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
+        DEFAULT, FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
     )
 
     Text(
@@ -200,7 +201,11 @@ fun PriorityChips(
             FilterChip(
                 selected = filter == priority,
                 onClick = {
-                    onUpdateFilterPreferences(priority, FilterType.BY_PRIORITY)
+                    val filterType =
+                        if (priority == DEFAULT) FilterType.DEFAULT
+                        else FilterType.BY_PRIORITY
+
+                    onUpdateFilterPreferences(priority, filterType)
                 },
                 label = { Text(text = priority) }
             )
@@ -459,7 +464,6 @@ fun LoadingState(
     }
 
 
-
 }
 
 @Composable
@@ -487,7 +491,6 @@ fun EmptyState(
 
         }
     }
-
 
 
 }
