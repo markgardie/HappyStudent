@@ -23,6 +23,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
 import com.example.happystudent.core.theme.components.NavBackTopBar
+import java.text.DateFormat
+import java.util.Date
 
 @Composable
 fun UpsertStudentScreen(
@@ -104,13 +106,18 @@ fun UpsertStudentScreen(
 
                 Button(
                     onClick = {
+
+                        val currentDate = DateFormat
+                            .getDateInstance()
+                            .format(Date())
+
                         viewModel.upsertStudent(
                             Student(
                                 id = studentId,
                                 name = nameText,
                                 group = groupText,
                                 leaving_probability = probabilityText.toDouble(),
-                                update_date = "сьогодні",
+                                update_date = currentDate,
                                 imageUrl = "",
                                 priority = ""
                             )
