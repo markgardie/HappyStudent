@@ -97,7 +97,13 @@ fun StudentListScreen(
                         onShowBottomSheet = { show ->
                             showBottomSheet = show
                         },
-                        shareText = viewModel.filterStudents().formatList(),
+                        shareText = viewModel
+                            .filterStudents(
+                                (uiState as StudentUiState.Success).students,
+                                (uiState as StudentUiState.Success).filterType,
+                                (uiState as StudentUiState.Success).filter
+                            )
+                            .formatList(),
                         context = context
                     )
                 },
@@ -115,14 +121,18 @@ fun StudentListScreen(
                     onShowChange = { show ->
                         showBottomSheet = show
                     },
-                    groups = viewModel.getGroups(),
+                    groups = viewModel.getGroups((uiState as StudentUiState.Success).students),
                     filter = (uiState as StudentUiState.Success).filter,
                     onUpdateFilterPreferences = viewModel::updateFilterPreferences
                 )
 
 
                 StudentList(
-                    students = viewModel.filterStudents(),
+                    students = viewModel.filterStudents(
+                        (uiState as StudentUiState.Success).students,
+                        (uiState as StudentUiState.Success).filterType,
+                        (uiState as StudentUiState.Success).filter
+                    ),
                     deleteStudent = viewModel::deleteStudent,
                     navigateToUpsert = navigateToUpsert,
                     innerPadding = innerPadding
