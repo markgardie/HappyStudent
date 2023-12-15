@@ -69,7 +69,7 @@ fun UpsertStudentScreen(
     var probabilityText by remember {
         mutableStateOf(
             if (probability == DEFAULT_PROBABILITY) {
-                student?.leaving_probability?.toString() ?: ""
+                student?.leaving_probability?.toString() ?: "0.0"
             } else probability.toString()
         )
     }
