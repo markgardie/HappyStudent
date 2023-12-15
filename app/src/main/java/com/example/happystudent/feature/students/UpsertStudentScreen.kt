@@ -1,10 +1,21 @@
 package com.example.happystudent.feature.students
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Scaffold
@@ -18,11 +29,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.happystudent.R
 import com.example.happystudent.core.model.Student
-import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
 import com.example.happystudent.core.theme.components.NavBackTopBar
+import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
 import java.text.DateFormat
 import java.util.Date
 
@@ -40,6 +58,38 @@ fun UpsertStudentScreen(
 
     val student = findStudent(uiState, studentId)
 
+    var nameText by rememberSaveable {
+        mutableStateOf(student?.name ?: "")
+    }
+
+    var groupText by rememberSaveable {
+        mutableStateOf(student?.group ?: "")
+    }
+
+    var probabilityText by remember {
+        mutableStateOf(
+            if (probability == DEFAULT_PROBABILITY) {
+                student?.leaving_probability?.toString() ?: ""
+            } else probability.toString()
+        )
+    }
+
+    var imageUri by rememberSaveable {
+        mutableStateOf<Uri?>(null)
+    }
+    val context = LocalContext.current
+    val bitmap = rememberSaveable {
+        mutableStateOf<Bitmap?>(null)
+    }
+
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUri = uri
+    }
+
+
     Scaffold(
         topBar = { NavBackTopBar(navigateBackToList) }
     ) { innerPadding ->
@@ -49,24 +99,38 @@ fun UpsertStudentScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
 
-            var nameText by rememberSaveable {
-                mutableStateOf(student?.name ?: "")
+            imageUri?.let {
+                if (Build.VERSION.SDK_INT < 28) {
+                    bitmap.value = MediaStore.Images
+                        .Media.getBitmap(context.contentResolver, it)
+
+                } else {
+                    val source = ImageDecoder
+                        .createSource(context.contentResolver, it)
+                    bitmap.value = ImageDecoder.decodeBitmap(source)
+                }
+
             }
 
-            var groupText by rememberSaveable {
-                mutableStateOf(student?.group ?: "")
-            }
 
-            var probabilityText by remember {
-                mutableStateOf(
-                    if (probability == DEFAULT_PROBABILITY) {
-                        student?.leaving_probability?.toString() ?: ""
-                    } else probability.toString()
-                )
-            }
+            Image(
+                painter = bitmap.value?.asImageBitmap()?.let { btm ->
+                    BitmapPainter(
+                        btm
+                    )
+                } ?: painterResource(id = R.drawable.avatar_placeholder),
+                contentDescription = "Фото студента",
+                modifier = Modifier
+                    .clickable { launcher.launch("image/*") }
+                    .padding(32.dp)
+                    .size(150.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
 
             TextField(
                 modifier = Modifier
