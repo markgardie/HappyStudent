@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -37,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.happystudent.R
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.theme.components.NavBackTopBar
@@ -77,17 +79,11 @@ fun UpsertStudentScreen(
     var imageUri by rememberSaveable {
         mutableStateOf<Uri?>(null)
     }
-    val context = LocalContext.current
-    val bitmap = rememberSaveable {
-        mutableStateOf<Bitmap?>(null)
-    }
 
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri
-    }
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> imageUri = uri }
+    )
 
 
     Scaffold(
@@ -102,29 +98,17 @@ fun UpsertStudentScreen(
             verticalArrangement = Arrangement.Top
         ) {
 
-            imageUri?.let {
-                if (Build.VERSION.SDK_INT < 28) {
-                    bitmap.value = MediaStore.Images
-                        .Media.getBitmap(context.contentResolver, it)
 
-                } else {
-                    val source = ImageDecoder
-                        .createSource(context.contentResolver, it)
-                    bitmap.value = ImageDecoder.decodeBitmap(source)
-                }
-
-            }
-
-
-            Image(
-                painter = bitmap.value?.asImageBitmap()?.let { btm ->
-                    BitmapPainter(
-                        btm
-                    )
-                } ?: painterResource(id = R.drawable.avatar_placeholder),
+            AsyncImage(
+                model = imageUri,
+                error = painterResource(id = R.drawable.avatar_placeholder),
                 contentDescription = "Фото студента",
                 modifier = Modifier
-                    .clickable { launcher.launch("image/*") }
+                    .clickable {
+                        photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
                     .padding(32.dp)
                     .size(150.dp)
                     .clip(CircleShape),
