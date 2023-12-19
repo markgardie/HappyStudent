@@ -166,7 +166,7 @@ fun UpsertStudentScreen(
                                 group = groupText,
                                 leaving_probability = probabilityText.toDouble(),
                                 update_date = currentDate,
-                                imageUrl = "",
+                                imageUri = "",
                                 priority = ""
                             )
                         )

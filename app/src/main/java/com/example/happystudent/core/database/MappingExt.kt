@@ -10,7 +10,7 @@ fun StudentEntity.asExternalModel() = Student(
     leaving_probability = leaving_probability,
     group = group,
     update_date = update_date,
-    imageUrl = imageUrl,
+    imageUri = imageUri,
     priority = priority
 )
 
@@ -20,7 +20,7 @@ fun Student.asEntity() = StudentEntity(
     leaving_probability = leaving_probability,
     group = group,
     update_date = update_date,
-    imageUrl = imageUrl,
+    imageUri = imageUri,
     priority = priority
 )
 

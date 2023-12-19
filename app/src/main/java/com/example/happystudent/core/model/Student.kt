@@ -6,7 +6,7 @@ data class Student(
     val leaving_probability: Double,
     val group: String,
     val update_date: String,
-    val imageUrl: String,
+    var imageUri: String,
     val priority: String
 ) {
 
