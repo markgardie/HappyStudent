@@ -82,7 +82,7 @@ fun UpsertStudentScreen(
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> imageUri = uri }
+        onResult = { uri -> uri?.let { imageUri = uri }}
     )
 
 
