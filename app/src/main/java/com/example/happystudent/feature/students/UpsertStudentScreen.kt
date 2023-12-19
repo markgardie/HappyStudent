@@ -77,7 +77,7 @@ fun UpsertStudentScreen(
     }
 
     var imageUri by rememberSaveable {
-        mutableStateOf<Uri?>(null)
+        mutableStateOf<Uri?>(Uri.parse(student?.imageUri ?: ""))
     }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -166,7 +166,7 @@ fun UpsertStudentScreen(
                                 group = groupText,
                                 leaving_probability = probabilityText.toDouble(),
                                 update_date = currentDate,
-                                imageUri = "",
+                                imageUri = imageUri.toString(),
                                 priority = ""
                             )
                         )
