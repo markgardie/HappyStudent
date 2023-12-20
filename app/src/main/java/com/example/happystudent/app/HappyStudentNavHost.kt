@@ -50,7 +50,8 @@ fun HappyStudentNavHost(
                 viewModel = studentViewModel,
                 navigateToList = navController::navigateToList,
                 navigateToSurvey = navController::navigateToSurvey,
-                navigateBackToList = navController::navigateBackToList
+                navigateBackToList = navController::navigateBackToList,
+                context = context
             )
 
             surveyScreen(

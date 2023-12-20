@@ -1,6 +1,6 @@
 package com.example.happystudent.feature.students.navigation
 
-import androidx.navigation.NavArgument
+import android.content.Context
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -31,7 +31,8 @@ fun NavGraphBuilder.upsertStudentScreen(
     viewModel: StudentViewModel,
     navigateToList: () -> Unit,
     navigateToSurvey: () -> Unit,
-    navigateBackToList: () -> Unit
+    navigateBackToList: () -> Unit,
+    context: Context
 ) {
 
     composable(
@@ -51,7 +52,8 @@ fun NavGraphBuilder.upsertStudentScreen(
             studentId = studentId ?: DEFAULT_STUDENT_ID,
             navigateToSurvey = navigateToSurvey,
             probability = probability ?: DEFAULT_PROBABILITY,
-            navigateBackToList = navigateBackToList
+            navigateBackToList = navigateBackToList,
+            context = context
         )
     }
 }

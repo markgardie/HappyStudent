@@ -1,14 +1,10 @@
 package com.example.happystudent.feature.students
 
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
+import android.content.Context
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,12 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.happystudent.R
@@ -53,7 +47,8 @@ fun UpsertStudentScreen(
     probability: Double,
     navigateToList: () -> Unit,
     navigateToSurvey: () -> Unit,
-    navigateBackToList: () -> Unit
+    navigateBackToList: () -> Unit,
+    context: Context
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -77,8 +72,11 @@ fun UpsertStudentScreen(
     }
 
     var imageUri by rememberSaveable {
-        mutableStateOf<Uri?>(Uri.parse(student?.imageUri ?: ""))
+        mutableStateOf(student?.imageUri?.toUri())
     }
+
+    val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+    imageUri?.let { context.contentResolver.takePersistableUriPermission(it, flag) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -166,7 +164,7 @@ fun UpsertStudentScreen(
                                 group = groupText,
                                 leaving_probability = probabilityText.toDouble(),
                                 update_date = currentDate,
-                                imageUri = imageUri.toString(),
+                                imageUri = imageUri?.toString(),
                                 priority = ""
                             )
                         )

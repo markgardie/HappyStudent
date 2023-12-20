@@ -2,7 +2,6 @@ package com.example.happystudent.feature.students
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
@@ -23,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DismissDirection
@@ -58,6 +56,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.happystudent.R
@@ -141,7 +140,8 @@ fun StudentListScreen(
                     ),
                     deleteStudent = viewModel::deleteStudent,
                     navigateToUpsert = navigateToUpsert,
-                    innerPadding = innerPadding
+                    innerPadding = innerPadding,
+                    context = context
                 )
             }
 
@@ -307,7 +307,8 @@ fun StudentList(
     students: List<Student>,
     deleteStudent: (Int) -> Unit,
     navigateToUpsert: (Int) -> Unit,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    context: Context
 ) {
 
     LazyColumn(
@@ -325,7 +326,8 @@ fun StudentList(
             StudentDismissItem(
                 student = it,
                 deleteStudent = deleteStudent,
-                navigateToUpsert = navigateToUpsert
+                navigateToUpsert = navigateToUpsert,
+                context = context
             )
 
         }
@@ -338,7 +340,8 @@ fun StudentList(
 fun StudentDismissItem(
     student: Student,
     deleteStudent: (Int) -> Unit,
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    context: Context
 ) {
 
     var show by remember { mutableStateOf(true) }
@@ -363,7 +366,8 @@ fun StudentDismissItem(
             dismissContent = {
                 StudentCard(
                     student = student,
-                    navigateToUpsert = navigateToUpsert
+                    navigateToUpsert = navigateToUpsert,
+                    context = context
                 )
             },
             directions = setOf(
@@ -403,8 +407,14 @@ fun DismissBackground() {
 @Composable
 fun StudentCard(
     student: Student,
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    context: Context
 ) {
+
+    val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+    student.imageUri?.let {
+        context.contentResolver.takePersistableUriPermission(it.toUri(), flag)
+    }
 
     val color by remember {
         mutableStateOf(
@@ -431,7 +441,7 @@ fun StudentCard(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape),
-                model = Uri.parse(student.imageUri),
+                model = student.imageUri?.toUri(),
                 error = painterResource(id = R.drawable.avatar_placeholder),
                 contentDescription = "Фото студента",
                 contentScale = ContentScale.Crop
