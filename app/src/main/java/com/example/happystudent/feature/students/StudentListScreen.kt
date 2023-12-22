@@ -1,6 +1,5 @@
 package com.example.happystudent.feature.students
 
-import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
@@ -46,13 +45,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
@@ -71,7 +70,6 @@ import com.example.happystudent.feature.students.StudentViewModel.Companion.SECO
 import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
 import com.example.happystudent.feature.students.util.formatList
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 
 
@@ -79,14 +77,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun StudentListScreen(
     viewModel: StudentViewModel,
-    navigateToUpsert: (Int) -> Unit,
-    context: Context
+    navigateToUpsert: (Int) -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
@@ -108,8 +104,7 @@ fun StudentListScreen(
                                 (uiState as StudentUiState.Success).filterType,
                                 (uiState as StudentUiState.Success).filter
                             )
-                            .formatList(),
-                        context = context
+                            .formatList()
                     )
                 },
                 floatingActionButton = {
@@ -122,7 +117,6 @@ fun StudentListScreen(
                 FilterBottomSheet(
                     sheetState = sheetState,
                     showBottomState = showBottomSheet,
-                    scope = scope,
                     onShowChange = { show ->
                         showBottomSheet = show
                     },
@@ -140,8 +134,7 @@ fun StudentListScreen(
                     ),
                     deleteStudent = viewModel::deleteStudent,
                     navigateToUpsert = navigateToUpsert,
-                    innerPadding = innerPadding,
-                    context = context
+                    innerPadding = innerPadding
                 )
             }
 
@@ -159,7 +152,6 @@ fun StudentListScreen(
 fun FilterBottomSheet(
     showBottomState: Boolean,
     sheetState: SheetState,
-    scope: CoroutineScope,
     onShowChange: (Boolean) -> Unit,
     onUpdateFilterPreferences: (String, FilterType) -> Unit,
     groups: List<String>,
@@ -271,9 +263,10 @@ fun GroupChips(
 @Composable
 fun StudentListTopBar(
     onShowBottomSheet: (Boolean) -> Unit,
-    shareText: String,
-    context: Context
+    shareText: String
 ) {
+
+    val context = LocalContext.current
 
     val sendIntent = Intent().apply {
         action = Intent.ACTION_SEND
@@ -307,8 +300,7 @@ fun StudentList(
     students: List<Student>,
     deleteStudent: (Int) -> Unit,
     navigateToUpsert: (Int) -> Unit,
-    innerPadding: PaddingValues,
-    context: Context
+    innerPadding: PaddingValues
 ) {
 
     LazyColumn(
@@ -326,8 +318,7 @@ fun StudentList(
             StudentDismissItem(
                 student = it,
                 deleteStudent = deleteStudent,
-                navigateToUpsert = navigateToUpsert,
-                context = context
+                navigateToUpsert = navigateToUpsert
             )
 
         }
@@ -340,8 +331,7 @@ fun StudentList(
 fun StudentDismissItem(
     student: Student,
     deleteStudent: (Int) -> Unit,
-    navigateToUpsert: (Int) -> Unit,
-    context: Context
+    navigateToUpsert: (Int) -> Unit
 ) {
 
     var show by remember { mutableStateOf(true) }
@@ -366,8 +356,7 @@ fun StudentDismissItem(
             dismissContent = {
                 StudentCard(
                     student = student,
-                    navigateToUpsert = navigateToUpsert,
-                    context = context
+                    navigateToUpsert = navigateToUpsert
                 )
             },
             directions = setOf(
@@ -407,9 +396,9 @@ fun DismissBackground() {
 @Composable
 fun StudentCard(
     student: Student,
-    navigateToUpsert: (Int) -> Unit,
-    context: Context
+    navigateToUpsert: (Int) -> Unit
 ) {
+    val context = LocalContext.current
 
     val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
     student.imageUri?.let {
