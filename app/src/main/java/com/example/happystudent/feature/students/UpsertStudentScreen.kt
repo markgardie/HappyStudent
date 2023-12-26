@@ -37,6 +37,7 @@ import com.example.happystudent.R
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.theme.components.NavBackTopBar
 import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
+import java.lang.Exception
 import java.text.DateFormat
 import java.util.Date
 
@@ -76,8 +77,13 @@ fun UpsertStudentScreen(
         mutableStateOf(student?.imageUri?.toUri())
     }
 
-    val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-    imageUri?.let { context.contentResolver.takePersistableUriPermission(it, flag) }
+    try {
+        imageUri?.let {
+            context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),

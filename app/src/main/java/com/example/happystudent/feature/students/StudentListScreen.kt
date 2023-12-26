@@ -71,6 +71,7 @@ import com.example.happystudent.feature.students.StudentViewModel.Companion.THIR
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
 import com.example.happystudent.feature.students.util.formatList
 import kotlinx.coroutines.delay
+import java.lang.Exception
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -400,9 +401,15 @@ fun StudentCard(
 ) {
     val context = LocalContext.current
 
-    val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-    student.imageUri?.let {
-        context.contentResolver.takePersistableUriPermission(it.toUri(), flag)
+    try {
+        student.imageUri?.let {
+            context.contentResolver.takePersistableUriPermission(
+                it.toUri(),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
 
     val color by remember {
