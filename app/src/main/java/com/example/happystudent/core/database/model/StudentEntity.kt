@@ -11,6 +11,6 @@ data class StudentEntity(
     val leaving_probability: Double,
     val group: String,
     val update_date: String,
-    val imageUri: String?,
+    val imageUri: String,
     val priority: String
 )

@@ -402,12 +402,10 @@ fun StudentCard(
     val context = LocalContext.current
 
     try {
-        student.imageUri?.let {
-            context.contentResolver.takePersistableUriPermission(
-                it.toUri(),
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-        }
+        context.contentResolver.takePersistableUriPermission(
+            student.imageUri.toUri(),
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
     } catch (e: Exception) {
         e.printStackTrace()
     }
@@ -437,7 +435,7 @@ fun StudentCard(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape),
-                model = student.imageUri?.toUri(),
+                model = student.imageUri.toUri(),
                 error = painterResource(id = R.drawable.avatar_placeholder),
                 contentDescription = "Фото студента",
                 contentScale = ContentScale.Crop
