@@ -7,14 +7,12 @@ import com.example.happystudent.core.data.repository.StudentRepository
 import com.example.happystudent.core.datastore.DefaultFilterPreferencesRepository
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.model.Student
-import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.logging.Filter
 import javax.inject.Inject
 
 @HiltViewModel

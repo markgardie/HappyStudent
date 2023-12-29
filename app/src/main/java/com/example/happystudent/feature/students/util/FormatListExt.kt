@@ -1,7 +1,6 @@
 package com.example.happystudent.feature.students.util
 
 import com.example.happystudent.core.model.Student
-import java.util.Objects
 
 
 fun List<Student>.formatList(): String {

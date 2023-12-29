@@ -1,6 +1,5 @@
 package com.example.happystudent.feature.students
 
-import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
@@ -14,13 +13,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DismissDirection
@@ -45,15 +45,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.happystudent.R
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.model.Student
@@ -66,22 +70,20 @@ import com.example.happystudent.feature.students.StudentViewModel.Companion.SECO
 import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
 import com.example.happystudent.feature.students.util.formatList
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import java.lang.Exception
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentListScreen(
     viewModel: StudentViewModel,
-    navigateToUpsert: (Int) -> Unit,
-    context: Context
+    navigateToUpsert: (Int) -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
@@ -103,8 +105,7 @@ fun StudentListScreen(
                                 (uiState as StudentUiState.Success).filterType,
                                 (uiState as StudentUiState.Success).filter
                             )
-                            .formatList(),
-                        context = context
+                            .formatList()
                     )
                 },
                 floatingActionButton = {
@@ -117,7 +118,6 @@ fun StudentListScreen(
                 FilterBottomSheet(
                     sheetState = sheetState,
                     showBottomState = showBottomSheet,
-                    scope = scope,
                     onShowChange = { show ->
                         showBottomSheet = show
                     },
@@ -153,7 +153,6 @@ fun StudentListScreen(
 fun FilterBottomSheet(
     showBottomState: Boolean,
     sheetState: SheetState,
-    scope: CoroutineScope,
     onShowChange: (Boolean) -> Unit,
     onUpdateFilterPreferences: (String, FilterType) -> Unit,
     groups: List<String>,
@@ -265,9 +264,10 @@ fun GroupChips(
 @Composable
 fun StudentListTopBar(
     onShowBottomSheet: (Boolean) -> Unit,
-    shareText: String,
-    context: Context
+    shareText: String
 ) {
+
+    val context = LocalContext.current
 
     val sendIntent = Intent().apply {
         action = Intent.ACTION_SEND
@@ -399,6 +399,16 @@ fun StudentCard(
     student: Student,
     navigateToUpsert: (Int) -> Unit
 ) {
+    val context = LocalContext.current
+
+    try {
+        context.contentResolver.takePersistableUriPermission(
+            student.imageUri.toUri(),
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 
     val color by remember {
         mutableStateOf(
@@ -421,9 +431,14 @@ fun StudentCard(
 
         },
         leadingContent = {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = "Фото студента"
+            AsyncImage(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape),
+                model = student.imageUri.toUri(),
+                error = painterResource(id = R.drawable.avatar_placeholder),
+                contentDescription = "Фото студента",
+                contentScale = ContentScale.Crop
             )
         },
         trailingContent = {

@@ -1,6 +1,5 @@
 package com.example.happystudent.feature.students.navigation
 
-import androidx.navigation.NavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType

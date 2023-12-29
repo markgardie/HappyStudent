@@ -1,6 +1,5 @@
 package com.example.happystudent.feature.students.navigation
 
-import android.content.Context
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -19,8 +18,7 @@ fun NavController.navigateBackToList() {
 
 fun NavGraphBuilder.studentListScreen(
     viewModel: StudentViewModel,
-    navigateToUpsert: (Int) -> Unit,
-    context: Context
+    navigateToUpsert: (Int) -> Unit
 ) {
     composable(
         route = studentListRoute
@@ -28,8 +26,7 @@ fun NavGraphBuilder.studentListScreen(
 
         StudentListScreen(
             viewModel = viewModel,
-            navigateToUpsert = navigateToUpsert,
-            context = context
+            navigateToUpsert = navigateToUpsert
         )
     }
 
