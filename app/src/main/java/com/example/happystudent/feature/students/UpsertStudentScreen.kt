@@ -6,14 +6,18 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -79,7 +83,10 @@ fun UpsertStudentScreen(
 
     try {
         imageUri?.let {
-            context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            context.contentResolver.takePersistableUriPermission(
+                it,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
         }
     } catch (e: Exception) {
         e.printStackTrace()
@@ -87,7 +94,7 @@ fun UpsertStudentScreen(
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> uri?.let { imageUri = uri }}
+        onResult = { uri -> uri?.let { imageUri = uri } }
     )
 
 
@@ -103,22 +110,38 @@ fun UpsertStudentScreen(
             verticalArrangement = Arrangement.Top
         ) {
 
-
-            AsyncImage(
-                model = imageUri,
-                error = painterResource(id = R.drawable.avatar_placeholder),
-                contentDescription = "Фото студента",
+            Box(
                 modifier = Modifier
-                    .clickable {
-                        photoPickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-                    }
-                    .padding(32.dp)
-                    .size(150.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
+                    .padding(32.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                AsyncImage(
+                    model = imageUri,
+                    error = painterResource(id = R.drawable.avatar_placeholder),
+                    contentDescription = "Фото студента",
+                    modifier = Modifier
+                        .clickable {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        }
+                        .size(150.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+
+
+                Icon(
+                    modifier = Modifier
+                        .clickable { imageUri = null },
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Видалити фото"
+                )
+
+
+            }
+
+
 
 
             TextField(
