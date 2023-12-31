@@ -9,7 +9,7 @@ message FilterPreferences {
   FilterType filter_type = 2;
 
   enum FilterType {
-    DEFAULT = 0;
+    ALL = 0;
     BY_PRIORITY = 1;
     BY_GROUP = 2;
   }
