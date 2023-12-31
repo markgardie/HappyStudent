@@ -62,12 +62,17 @@ import com.example.happystudent.R
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.theme.Green40
+import com.example.happystudent.core.theme.PurpleGrey40
 import com.example.happystudent.core.theme.Red40
 import com.example.happystudent.core.theme.Yellow60
-import com.example.happystudent.feature.students.StudentViewModel.Companion.DEFAULT
+import com.example.happystudent.feature.students.StudentViewModel.Companion.ALL
+import com.example.happystudent.feature.students.StudentViewModel.Companion.CRITICAL_PROB
 import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
+import com.example.happystudent.feature.students.StudentViewModel.Companion.IMPORTANT_PROB
+import com.example.happystudent.feature.students.StudentViewModel.Companion.UNDEFINED
 import com.example.happystudent.feature.students.StudentViewModel.Companion.SECOND_PRIORITY
 import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
+import com.example.happystudent.feature.students.StudentViewModel.Companion.ZERO_PROB
 import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
 import com.example.happystudent.feature.students.util.formatList
 import kotlinx.coroutines.delay
@@ -189,7 +194,7 @@ fun PriorityChips(
 ) {
 
     val priorities = listOf(
-        DEFAULT, FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
+        ALL, UNDEFINED, FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
     )
 
     Text(
@@ -211,7 +216,7 @@ fun PriorityChips(
                 selected = filter == priority,
                 onClick = {
                     val filterType =
-                        if (priority == DEFAULT) FilterType.DEFAULT
+                        if (priority == ALL) FilterType.ALL
                         else FilterType.BY_PRIORITY
 
                     onUpdateFilterPreferences(priority, filterType)
@@ -412,8 +417,9 @@ fun StudentCard(
 
     val color by remember {
         mutableStateOf(
-            if (student.leaving_probability > 70) Red40
-            else if (student.leaving_probability > 40) Yellow60
+            if (student.leaving_probability > CRITICAL_PROB) Red40
+            else if (student.leaving_probability > IMPORTANT_PROB) Yellow60
+            else if (student.leaving_probability == ZERO_PROB) PurpleGrey40
             else Green40
         )
     }

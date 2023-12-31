@@ -11,7 +11,7 @@ object FilterPreferencesSerializer: Serializer<FilterPreferences> {
     override val defaultValue: FilterPreferences =  FilterPreferences
         .getDefaultInstance()
         .toBuilder()
-        .setFilter(StudentViewModel.DEFAULT)
+        .setFilter(StudentViewModel.ALL)
         .build()
 
 

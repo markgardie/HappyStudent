@@ -43,6 +43,7 @@ class StudentViewModel @Inject constructor(
 
         val priority = if (student.leaving_probability > CRITICAL_PROB) FIRST_PRIORITY
         else if (student.leaving_probability > IMPORTANT_PROB) SECOND_PRIORITY
+        else if (student.leaving_probability == ZERO_PROB) UNDEFINED
         else THIRD_PRIORITY
 
         viewModelScope.launch {
@@ -91,14 +92,15 @@ class StudentViewModel @Inject constructor(
 
     companion object {
 
-        const val CRITICAL_PROB = 70
-        const val IMPORTANT_PROB = 40
+        const val CRITICAL_PROB = 70.0
+        const val IMPORTANT_PROB = 40.0
+        const val ZERO_PROB = 0.0
 
-        const val DEFAULT = "Всі"
+        const val ALL = "Всі"
         const val FIRST_PRIORITY = "Критично"
         const val SECOND_PRIORITY = "Варті уваги"
         const val THIRD_PRIORITY = "Задовільно"
-
+        const val UNDEFINED = "Неоцінено"
 
     }
 
