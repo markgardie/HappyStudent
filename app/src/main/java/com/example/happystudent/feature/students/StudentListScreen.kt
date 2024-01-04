@@ -65,6 +65,10 @@ import com.example.happystudent.core.theme.Green40
 import com.example.happystudent.core.theme.PurpleGrey40
 import com.example.happystudent.core.theme.Red40
 import com.example.happystudent.core.theme.Yellow60
+import com.example.happystudent.core.theme.components.FabItem
+import com.example.happystudent.core.theme.components.MultiFabState
+import com.example.happystudent.core.theme.components.MultiFloatingActionButton
+import com.example.happystudent.core.theme.components.rememberMultiFabState
 import com.example.happystudent.feature.students.StudentViewModel.Companion.ALL
 import com.example.happystudent.feature.students.StudentViewModel.Companion.CRITICAL_PROB
 import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
@@ -78,6 +82,10 @@ import com.example.happystudent.feature.students.util.formatList
 import kotlinx.coroutines.delay
 import java.lang.Exception
 
+
+const val FAB_ROTATE = 315f
+const val ONE_STUDENT_FAB_LABEL = "Додати одного студента"
+const val GROUP_FAB_LABEL = "Додати групу студентів"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,8 +101,22 @@ fun StudentListScreen(
         mutableStateOf(false)
     }
 
+    var multiFabState by rememberMultiFabState()
+
+    val fabItems = listOf(
+        FabItem(id = 0, label = ONE_STUDENT_FAB_LABEL),
+        FabItem(id = 1, label = GROUP_FAB_LABEL)
+    )
+
+
     when (uiState) {
-        is StudentUiState.Empty -> EmptyState(navigateToUpsert = navigateToUpsert)
+
+        is StudentUiState.Empty -> EmptyState(
+            navigateToUpsert = navigateToUpsert,
+            multiFabState = multiFabState,
+            fabItems = fabItems,
+            onStateChanged = { multiFabState = it  }
+        )
         is StudentUiState.Loading -> LoadingState(navigateToUpsert = navigateToUpsert)
         is StudentUiState.Success -> {
 
@@ -114,10 +136,22 @@ fun StudentListScreen(
                     )
                 },
                 floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
-                    }
+
+                    MultiFloatingActionButton(
+                        state = multiFabState,
+                        onStateChange = {
+                            multiFabState = it
+                        },
+                        mainIconRes = R.drawable.ic_add,
+                        rotateDegree = FAB_ROTATE,
+                        fabItems = fabItems,
+                        onItemClicked = { fabItem ->
+                            if (fabItem.label == ONE_STUDENT_FAB_LABEL) {
+                                navigateToUpsert(DEFAULT_STUDENT_ID)
+                            }
+                        }
+                    )
+
                 }
             ) { innerPadding ->
                 FilterBottomSheet(
@@ -499,15 +533,28 @@ fun LoadingState(
 
 @Composable
 fun EmptyState(
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    multiFabState: MultiFabState,
+    fabItems: List<FabItem>,
+    onStateChanged: (MultiFabState) -> Unit
 ) {
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
-            }
+            MultiFloatingActionButton(
+                state = multiFabState,
+                onStateChange = {
+                    onStateChanged(it)
+                },
+                mainIconRes = R.drawable.ic_add,
+                rotateDegree = FAB_ROTATE,
+                fabItems = fabItems,
+                onItemClicked = { fabItem ->
+                    if (fabItem.label == ONE_STUDENT_FAB_LABEL) {
+                        navigateToUpsert(DEFAULT_STUDENT_ID)
+                    }
+                }
+            )
         }
     ) { innerPadding ->
         Column(
