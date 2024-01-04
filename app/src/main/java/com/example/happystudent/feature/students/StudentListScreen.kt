@@ -91,7 +91,8 @@ const val GROUP_FAB_LABEL = "Додати групу студентів"
 @Composable
 fun StudentListScreen(
     viewModel: StudentViewModel,
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    navigateToBatch: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -148,6 +149,8 @@ fun StudentListScreen(
                         onItemClicked = { fabItem ->
                             if (fabItem.label == ONE_STUDENT_FAB_LABEL) {
                                 navigateToUpsert(DEFAULT_STUDENT_ID)
+                            } else {
+                                navigateToBatch()
                             }
                         }
                     )

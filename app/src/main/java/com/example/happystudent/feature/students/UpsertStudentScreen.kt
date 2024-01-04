@@ -50,7 +50,6 @@ fun UpsertStudentScreen(
     viewModel: StudentViewModel,
     studentId: Int,
     probability: Double,
-    navigateToList: () -> Unit,
     navigateToSurvey: () -> Unit,
     navigateBackToList: () -> Unit
 ) {
@@ -198,7 +197,7 @@ fun UpsertStudentScreen(
                                 priority = ""
                             )
                         )
-                        navigateToList()
+                        navigateBackToList()
 
                     }) {
                     Text(text = "Зберегти")
