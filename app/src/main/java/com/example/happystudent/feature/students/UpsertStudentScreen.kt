@@ -18,9 +18,9 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +41,6 @@ import com.example.happystudent.R
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.theme.components.NavBackTopBar
 import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
-import java.lang.Exception
 import java.text.DateFormat
 import java.util.Date
 
@@ -140,10 +139,7 @@ fun UpsertStudentScreen(
 
             }
 
-
-
-
-            TextField(
+            OutlinedTextField(
                 modifier = Modifier
                     .padding(vertical = 16.dp),
                 value = nameText,
@@ -151,13 +147,13 @@ fun UpsertStudentScreen(
                 label = { Text(text = "Ім'я") }
             )
 
-            TextField(
+            OutlinedTextField(
                 value = groupText,
                 onValueChange = { groupText = it },
                 label = { Text(text = "Група") }
             )
 
-            TextField(
+            OutlinedTextField(
                 modifier = Modifier
                     .padding(vertical = 16.dp),
                 value = probabilityText,
