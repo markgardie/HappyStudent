@@ -9,9 +9,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.happystudent.feature.students.StudentViewModel
+import com.example.happystudent.feature.students.navigation.batchInsertScreen
 import com.example.happystudent.feature.students.navigation.navigateBackToList
 import com.example.happystudent.feature.students.navigation.navigateBackToUpsert
-import com.example.happystudent.feature.students.navigation.navigateToList
+import com.example.happystudent.feature.students.navigation.navigateToBatch
 import com.example.happystudent.feature.students.navigation.navigateToUpsertStudent
 import com.example.happystudent.feature.students.navigation.studentListRoute
 import com.example.happystudent.feature.students.navigation.studentListScreen
@@ -39,12 +40,12 @@ fun HappyStudentNavHost() {
 
             studentListScreen(
                 viewModel = studentViewModel,
-                navigateToUpsert = navController::navigateToUpsertStudent
+                navigateToUpsert = navController::navigateToUpsertStudent,
+                navigateToBatch = navController::navigateToBatch
             )
 
             upsertStudentScreen(
                 viewModel = studentViewModel,
-                navigateToList = navController::navigateToList,
                 navigateToSurvey = navController::navigateToSurvey,
                 navigateBackToList = navController::navigateBackToList
             )
@@ -52,6 +53,11 @@ fun HappyStudentNavHost() {
             surveyScreen(
                 viewModel = surveyViewModel,
                 navigateBackToUpsert = navController::navigateBackToUpsert
+            )
+
+            batchInsertScreen(
+                viewModel = studentViewModel,
+                navigateBackToList = navController::navigateBackToList
             )
 
         }
