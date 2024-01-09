@@ -116,8 +116,10 @@ fun StudentListScreen(
             navigateToUpsert = navigateToUpsert,
             multiFabState = multiFabState,
             fabItems = fabItems,
-            onStateChanged = { multiFabState = it  }
+            onStateChanged = { multiFabState = it },
+            navigateToBatch = navigateToBatch
         )
+
         is StudentUiState.Loading -> LoadingState(navigateToUpsert = navigateToUpsert)
         is StudentUiState.Success -> {
 
@@ -537,6 +539,7 @@ fun LoadingState(
 @Composable
 fun EmptyState(
     navigateToUpsert: (Int) -> Unit,
+    navigateToBatch: () -> Unit,
     multiFabState: MultiFabState,
     fabItems: List<FabItem>,
     onStateChanged: (MultiFabState) -> Unit
@@ -553,9 +556,8 @@ fun EmptyState(
                 rotateDegree = FAB_ROTATE,
                 fabItems = fabItems,
                 onItemClicked = { fabItem ->
-                    if (fabItem.label == ONE_STUDENT_FAB_LABEL) {
-                        navigateToUpsert(DEFAULT_STUDENT_ID)
-                    }
+                    if (fabItem.label == ONE_STUDENT_FAB_LABEL) navigateToUpsert(DEFAULT_STUDENT_ID)
+                    else navigateToBatch()
                 }
             )
         }
