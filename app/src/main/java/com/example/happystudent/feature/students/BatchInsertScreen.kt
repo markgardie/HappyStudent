@@ -52,7 +52,7 @@ fun BatchInsertScreen(
         ) {
 
             Text(
-                text = "Введіть імена учнів через кому. Для зручності дозволяється прописувати учнів на кожній новій строчці",
+                text = "Введіть імена учнів через такі розділювачі: кома, пробіл, перенос на наступну строку",
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -82,6 +82,12 @@ fun BatchInsertScreen(
                     val currentDate = DateFormat
                         .getDateInstance()
                         .format(Date())
+
+                    viewModel.batchInsert(
+                        insertDate = currentDate,
+                        group = groupNameText,
+                        studentListString = studentListString
+                    )
 
                     navigateBackToList()
 
