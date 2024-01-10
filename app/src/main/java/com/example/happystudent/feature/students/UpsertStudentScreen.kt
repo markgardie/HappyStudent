@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -42,6 +43,7 @@ import com.example.happystudent.R
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PROBABILITY
 import com.example.happystudent.core.theme.components.NavBackTopBar
+import com.example.happystudent.core.theme.padding
 import java.text.DateFormat
 import java.util.Date
 
@@ -111,7 +113,7 @@ fun UpsertStudentScreen(
 
             Box(
                 modifier = Modifier
-                    .padding(32.dp),
+                    .padding(MaterialTheme.padding.large),
                 contentAlignment = Alignment.BottomEnd
             ) {
                 AsyncImage(
@@ -142,7 +144,7 @@ fun UpsertStudentScreen(
 
             OutlinedTextField(
                 modifier = Modifier
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = MaterialTheme.padding.medium),
                 value = nameText,
                 onValueChange = { nameText = it },
                 label = { Text(text = stringResource(id = R.string.student_name)) }
@@ -156,19 +158,19 @@ fun UpsertStudentScreen(
 
             OutlinedTextField(
                 modifier = Modifier
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = MaterialTheme.padding.medium),
                 value = probabilityText,
                 onValueChange = { probabilityText = it },
                 label = { Text(text = stringResource(id = R.string.probability)) }
             )
 
             Row(
-                modifier = Modifier.padding(vertical = 32.dp),
+                modifier = Modifier.padding(vertical = MaterialTheme.padding.large),
                 horizontalArrangement = Arrangement.Center
             ) {
 
                 FilledTonalButton(
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(horizontal = MaterialTheme.padding.medium),
                     onClick = {
                         navigateToSurvey()
                     }

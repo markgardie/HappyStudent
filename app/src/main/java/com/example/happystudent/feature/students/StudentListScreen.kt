@@ -79,6 +79,7 @@ import com.example.happystudent.core.theme.components.FabItem
 import com.example.happystudent.core.theme.components.MultiFabState
 import com.example.happystudent.core.theme.components.MultiFloatingActionButton
 import com.example.happystudent.core.theme.components.rememberMultiFabState
+import com.example.happystudent.core.theme.padding
 import com.example.happystudent.feature.students.util.formatList
 import kotlinx.coroutines.delay
 
@@ -240,16 +241,23 @@ fun PriorityChips(
 
     Text(
         modifier = Modifier
-            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
+            .padding(
+                top = MaterialTheme.padding.small,
+                bottom =MaterialTheme.padding.small,
+                start = MaterialTheme.padding.medium
+            ),
         text = stringResource(R.string.priority_filter)
     )
 
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, bottom = 16.dp),
+            .padding(
+                start = MaterialTheme.padding.medium,
+                bottom = MaterialTheme.padding.medium
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small)
     ) {
 
         items(priorities) { priority ->
@@ -281,16 +289,23 @@ fun GroupChips(
 
     Text(
         modifier = Modifier
-            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
+            .padding(
+                top = MaterialTheme.padding.small,
+                bottom = MaterialTheme.padding.small,
+                start = MaterialTheme.padding.medium
+            ),
         text = stringResource(R.string.group_filter)
     )
 
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, bottom = 16.dp),
+            .padding(
+                start = MaterialTheme.padding.medium,
+                bottom = MaterialTheme.padding.medium
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small)
     ) {
         items(groups) { group ->
 
@@ -427,7 +442,7 @@ fun DismissBackground() {
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .padding(12.dp, 8.dp),
+            .padding(MaterialTheme.padding.medium, MaterialTheme.padding.small),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -493,7 +508,7 @@ fun StudentCard(
 
                 Text(
                     modifier = Modifier
-                        .padding(bottom = 8.dp)
+                        .padding(bottom = MaterialTheme.padding.small)
                         .background(
                             color = color,
                             shape = MaterialTheme.shapes.extraSmall
