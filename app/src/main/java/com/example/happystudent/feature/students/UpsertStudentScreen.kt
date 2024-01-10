@@ -40,8 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.happystudent.R
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PROBABILITY
 import com.example.happystudent.core.theme.components.NavBackTopBar
-import com.example.happystudent.feature.students.navigation.DEFAULT_PROBABILITY
 import java.text.DateFormat
 import java.util.Date
 
@@ -70,7 +70,7 @@ fun UpsertStudentScreen(
 
     var probabilityText by remember {
         mutableStateOf(
-            if (probability == DEFAULT_PROBABILITY) {
+            if (probability == UNDEFINED_PROBABILITY) {
                 student?.leaving_probability?.toString() ?: "0.0"
             } else probability.toString()
         )

@@ -62,6 +62,15 @@ import coil.compose.AsyncImage
 import com.example.happystudent.R
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.core.model.Student.Companion.ALL
+import com.example.happystudent.core.model.Student.Companion.CRITICAL_PROB
+import com.example.happystudent.core.model.Student.Companion.FIRST_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.IMPORTANT_PROB
+import com.example.happystudent.core.model.Student.Companion.SECOND_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.THIRD_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.UNDEFINED_ID
+import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import com.example.happystudent.core.theme.Green40
 import com.example.happystudent.core.theme.PurpleGrey40
 import com.example.happystudent.core.theme.Red40
@@ -70,24 +79,15 @@ import com.example.happystudent.core.theme.components.FabItem
 import com.example.happystudent.core.theme.components.MultiFabState
 import com.example.happystudent.core.theme.components.MultiFloatingActionButton
 import com.example.happystudent.core.theme.components.rememberMultiFabState
-import com.example.happystudent.feature.students.StudentViewModel.Companion.ALL
-import com.example.happystudent.feature.students.StudentViewModel.Companion.CRITICAL_PROB
-import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
-import com.example.happystudent.feature.students.StudentViewModel.Companion.IMPORTANT_PROB
-import com.example.happystudent.feature.students.StudentViewModel.Companion.UNDEFINED
-import com.example.happystudent.feature.students.StudentViewModel.Companion.SECOND_PRIORITY
-import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
-import com.example.happystudent.feature.students.StudentViewModel.Companion.ZERO_PROB
-import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
 import com.example.happystudent.feature.students.util.formatList
 import kotlinx.coroutines.delay
-import java.lang.Exception
 
 
 const val FAB_ROTATE = 315f
 const val ONE_STUDENT_FAB_LABEL = "Додати одного студента"
 const val GROUP_FAB_LABEL = "Додати групу студентів"
-
+const val ONE_STUDENT_FAB_ID = 0
+const val GROUP_FAB_ID = 1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,8 +107,8 @@ fun StudentListScreen(
     var multiFabState by rememberMultiFabState()
 
     val fabItems = listOf(
-        FabItem(id = 0, label = ONE_STUDENT_FAB_LABEL),
-        FabItem(id = 1, label = GROUP_FAB_LABEL)
+        FabItem(id = ONE_STUDENT_FAB_ID, label = ONE_STUDENT_FAB_LABEL),
+        FabItem(id = GROUP_FAB_ID, label = GROUP_FAB_LABEL)
     )
 
 
@@ -152,7 +152,7 @@ fun StudentListScreen(
                         fabItems = fabItems,
                         onItemClicked = { fabItem ->
                             if (fabItem.label == ONE_STUDENT_FAB_LABEL) {
-                                navigateToUpsert(DEFAULT_STUDENT_ID)
+                                navigateToUpsert(UNDEFINED_ID)
                             } else {
                                 navigateToBatch()
                             }
@@ -235,7 +235,7 @@ fun PriorityChips(
 ) {
 
     val priorities = listOf(
-        ALL, UNDEFINED, FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
+        ALL, UNDEFINED_PRIORITY, FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
     )
 
     Text(
@@ -519,7 +519,7 @@ fun LoadingState(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
+                onClick = { navigateToUpsert(UNDEFINED_ID) }) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add_student))
             }
         }
@@ -558,7 +558,7 @@ fun EmptyState(
                 rotateDegree = FAB_ROTATE,
                 fabItems = fabItems,
                 onItemClicked = { fabItem ->
-                    if (fabItem.label == ONE_STUDENT_FAB_LABEL) navigateToUpsert(DEFAULT_STUDENT_ID)
+                    if (fabItem.label == ONE_STUDENT_FAB_LABEL) navigateToUpsert(UNDEFINED_ID)
                     else navigateToBatch()
                 }
             )
