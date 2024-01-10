@@ -57,6 +57,27 @@ class StudentViewModel @Inject constructor(
         }
     }
 
+    fun batchInsert(
+        insertDate: String,
+        group: String,
+        studentListString: String
+    ) {
+
+        studentListString
+            .split(",\\s+|\\s+,\\s+|\\s+|,".toRegex())
+            .forEach {
+                upsertStudent(
+                    Student(
+                        name = it,
+                        update_date = insertDate,
+                        group = group
+                    )
+                )
+            }
+
+
+    }
+
     fun updateFilterPreferences(
         filter: String,
         filterType: FilterType
