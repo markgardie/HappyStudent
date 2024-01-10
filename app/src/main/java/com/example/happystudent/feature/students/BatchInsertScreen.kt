@@ -17,8 +17,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.happystudent.R
 import com.example.happystudent.core.theme.components.NavBackTopBar
 import java.text.DateFormat
 import java.util.Date
@@ -52,7 +54,7 @@ fun BatchInsertScreen(
         ) {
 
             Text(
-                text = "Введіть імена учнів через такі розділювачі: кома, пробіл, перенос на наступну строку",
+                text = stringResource(id = R.string.batch_insert_instruction),
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -65,13 +67,13 @@ fun BatchInsertScreen(
                 modifier = Modifier
                     .padding(vertical = 24.dp)
                     .width(300.dp),
-                label = { Text(text = "Назва групи") }
+                label = { Text(text = stringResource(id = R.string.group_name)) }
             )
 
             OutlinedTextField(
                 value = studentListString,
                 onValueChange = { studentListString = it },
-                label = { Text(text = "Список студентів") },
+                label = { Text(text = stringResource(id = R.string.student_list)) },
                 modifier = Modifier
                     .width(300.dp),
             )
@@ -95,7 +97,7 @@ fun BatchInsertScreen(
                 modifier = Modifier.padding(vertical = 32.dp)
 
             ) {
-                Text(text = "Додати")
+                Text(text = stringResource(id = R.string.add))
             }
         }
 

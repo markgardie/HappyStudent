@@ -53,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.net.toUri
@@ -86,6 +87,7 @@ import java.lang.Exception
 const val FAB_ROTATE = 315f
 const val ONE_STUDENT_FAB_LABEL = "Додати одного студента"
 const val GROUP_FAB_LABEL = "Додати групу студентів"
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -239,7 +241,7 @@ fun PriorityChips(
     Text(
         modifier = Modifier
             .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
-        text = "Фільтр по пріоритетам"
+        text = stringResource(R.string.priority_filter)
     )
 
     LazyRow(
@@ -280,7 +282,7 @@ fun GroupChips(
     Text(
         modifier = Modifier
             .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
-        text = "Фільтр по групам"
+        text = stringResource(R.string.group_filter)
     )
 
     LazyRow(
@@ -321,18 +323,18 @@ fun StudentListTopBar(
     val shareIntent = Intent.createChooser(sendIntent, null)
 
     TopAppBar(
-        title = { Text(text = "Happy Student") },
+        title = { Text(text = stringResource(R.string.happy_student_top_bar)) },
         actions = {
             IconButton(onClick = { onShowBottomSheet(true) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_filter),
-                    contentDescription = "Фільтр учнів"
+                    contentDescription = stringResource(R.string.student_filter)
                 )
             }
             IconButton(onClick = { startActivity(context, shareIntent, null) }) {
                 Icon(
                     imageVector = Icons.Filled.Share,
-                    contentDescription = "Поділитись списком"
+                    contentDescription = stringResource(R.string.share_student_list)
                 )
             }
         }
@@ -432,7 +434,7 @@ fun DismissBackground() {
 
         Icon(
             Icons.Default.Delete,
-            contentDescription = "delete"
+            contentDescription = stringResource(R.string.delete_student)
         )
 
     }
@@ -482,7 +484,7 @@ fun StudentCard(
                     .clip(CircleShape),
                 model = student.imageUri.toUri(),
                 error = painterResource(id = R.drawable.avatar_placeholder),
-                contentDescription = "Фото студента",
+                contentDescription = stringResource(id = R.string.student_photo),
                 contentScale = ContentScale.Crop
             )
         },
@@ -518,7 +520,7 @@ fun LoadingState(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
+                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add_student))
             }
         }
     ) { innerPadding ->
@@ -570,7 +572,7 @@ fun EmptyState(
             verticalArrangement = Arrangement.Center
         ) {
 
-            Text(text = "Немає учнів")
+            Text(text = stringResource(R.string.empty_student_list))
 
         }
     }

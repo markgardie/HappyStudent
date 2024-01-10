@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -116,7 +117,7 @@ fun UpsertStudentScreen(
                 AsyncImage(
                     model = imageUri,
                     error = painterResource(id = R.drawable.avatar_placeholder),
-                    contentDescription = "Фото студента",
+                    contentDescription = stringResource(id = R.string.student_photo),
                     modifier = Modifier
                         .clickable {
                             photoPickerLauncher.launch(
@@ -133,7 +134,7 @@ fun UpsertStudentScreen(
                     modifier = Modifier
                         .clickable { imageUri = null },
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Видалити фото"
+                    contentDescription = stringResource(id = R.string.delete_photo)
                 )
 
 
@@ -144,13 +145,13 @@ fun UpsertStudentScreen(
                     .padding(vertical = 16.dp),
                 value = nameText,
                 onValueChange = { nameText = it },
-                label = { Text(text = "Ім'я") }
+                label = { Text(text = stringResource(id = R.string.student_name)) }
             )
 
             OutlinedTextField(
                 value = groupText,
                 onValueChange = { groupText = it },
-                label = { Text(text = "Група") }
+                label = { Text(text = stringResource(id = R.string.group_name)) }
             )
 
             OutlinedTextField(
@@ -158,7 +159,7 @@ fun UpsertStudentScreen(
                     .padding(vertical = 16.dp),
                 value = probabilityText,
                 onValueChange = { probabilityText = it },
-                label = { Text(text = "Вірогідність відвалу") }
+                label = { Text(text = stringResource(id = R.string.probability)) }
             )
 
             Row(
@@ -172,7 +173,7 @@ fun UpsertStudentScreen(
                         navigateToSurvey()
                     }
                 ) {
-                    Text(text = "Оцінити учня")
+                    Text(text = stringResource(R.string.evaluate_student))
                 }
 
                 Button(
@@ -195,7 +196,7 @@ fun UpsertStudentScreen(
                         navigateBackToList()
 
                     }) {
-                    Text(text = "Зберегти")
+                    Text(text = stringResource(R.string.save))
                 }
             }
 
