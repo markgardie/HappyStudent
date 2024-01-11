@@ -475,7 +475,7 @@ fun StudentCard(
         mutableStateOf(
             if (student.leaving_probability > CRITICAL_PROB) Red40
             else if (student.leaving_probability > IMPORTANT_PROB) Yellow60
-            else if (student.leaving_probability == ZERO_PROB) PurpleGrey40
+            else if (student.leaving_probability <= ZERO_PROB) PurpleGrey40
             else Green40
         )
     }

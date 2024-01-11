@@ -50,7 +50,7 @@ class StudentViewModel @Inject constructor(
 
         val priority = if (student.leaving_probability > CRITICAL_PROB) FIRST_PRIORITY
         else if (student.leaving_probability > IMPORTANT_PROB) SECOND_PRIORITY
-        else if (student.leaving_probability == ZERO_PROB) UNDEFINED_PRIORITY
+        else if (student.leaving_probability <= ZERO_PROB) UNDEFINED_PRIORITY
         else THIRD_PRIORITY
 
         viewModelScope.launch {
