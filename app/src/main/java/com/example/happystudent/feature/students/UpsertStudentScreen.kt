@@ -46,6 +46,9 @@ import com.example.happystudent.core.theme.padding
 import java.text.DateFormat
 import java.util.Date
 
+
+private const val STUDEN_PHOTO_SIZE = 150
+
 @Composable
 fun UpsertStudentScreen(
     viewModel: StudentViewModel,
@@ -120,7 +123,7 @@ fun UpsertStudentScreen(
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             )
                         }
-                        .size(150.dp)
+                        .size(STUDEN_PHOTO_SIZE.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )

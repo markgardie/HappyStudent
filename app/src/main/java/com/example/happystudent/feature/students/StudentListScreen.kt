@@ -84,11 +84,14 @@ import com.example.happystudent.feature.students.util.formatList
 import kotlinx.coroutines.delay
 
 
-const val FAB_ROTATE = 315f
-const val ONE_STUDENT_FAB_LABEL = "Додати одного студента"
-const val GROUP_FAB_LABEL = "Додати групу студентів"
-const val ONE_STUDENT_FAB_ID = 0
-const val GROUP_FAB_ID = 1
+private const val FAB_ROTATE = 315f
+private const val ONE_STUDENT_FAB_LABEL = "Додати одного студента"
+private const val GROUP_FAB_LABEL = "Додати групу студентів"
+private const val ONE_STUDENT_FAB_ID = 0
+private const val GROUP_FAB_ID = 1
+private const val POSITIONAL_THRESHOLD = 150
+private const val DELETING_DELAY = 800L
+private const val STUDENT_ICON_SIZE = 50
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -388,6 +391,10 @@ fun StudentList(
     }
 }
 
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentDismissItem(
@@ -404,7 +411,7 @@ fun StudentDismissItem(
                 show = false
                 true
             } else false
-        }, positionalThreshold = { 150.dp.toPx() }
+        }, positionalThreshold = { POSITIONAL_THRESHOLD.dp.toPx() }
     )
 
     AnimatedVisibility(
@@ -429,7 +436,7 @@ fun StudentDismissItem(
 
     LaunchedEffect(show) {
         if (!show) {
-            delay(800)
+            delay(DELETING_DELAY)
             deleteStudent(currentItem.id)
         }
     }
@@ -495,7 +502,7 @@ fun StudentCard(
         leadingContent = {
             AsyncImage(
                 modifier = Modifier
-                    .size(50.dp)
+                    .size(STUDENT_ICON_SIZE.dp)
                     .clip(CircleShape),
                 model = student.imageUri.toUri(),
                 error = painterResource(id = R.drawable.avatar_placeholder),

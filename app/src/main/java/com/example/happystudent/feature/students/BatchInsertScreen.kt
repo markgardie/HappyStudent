@@ -27,6 +27,9 @@ import com.example.happystudent.core.theme.padding
 import java.text.DateFormat
 import java.util.Date
 
+
+private const val TEXT_FIELD_WIDTH = 300
+
 @Composable
 fun BatchInsertScreen(
     viewModel: StudentViewModel,
@@ -60,7 +63,7 @@ fun BatchInsertScreen(
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .padding(horizontal = MaterialTheme.padding.medium)
-                    .width(300.dp)
+                    .width(TEXT_FIELD_WIDTH.dp)
             )
 
             OutlinedTextField(
@@ -68,7 +71,7 @@ fun BatchInsertScreen(
                 onValueChange = { groupNameText = it },
                 modifier = Modifier
                     .padding(vertical = MaterialTheme.padding.large)
-                    .width(300.dp),
+                    .width(TEXT_FIELD_WIDTH.dp),
                 label = { Text(text = stringResource(id = R.string.group_name)) }
             )
 
@@ -77,7 +80,7 @@ fun BatchInsertScreen(
                 onValueChange = { studentListString = it },
                 label = { Text(text = stringResource(id = R.string.student_list)) },
                 modifier = Modifier
-                    .width(300.dp),
+                    .width(TEXT_FIELD_WIDTH.dp),
             )
 
             Button(
