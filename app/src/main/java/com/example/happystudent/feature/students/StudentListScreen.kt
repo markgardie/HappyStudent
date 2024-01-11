@@ -53,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.net.toUri
@@ -61,24 +62,43 @@ import coil.compose.AsyncImage
 import com.example.happystudent.R
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.core.model.Student.Companion.ALL
+import com.example.happystudent.core.model.Student.Companion.CRITICAL_PROB
+import com.example.happystudent.core.model.Student.Companion.FIRST_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.IMPORTANT_PROB
+import com.example.happystudent.core.model.Student.Companion.SECOND_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.THIRD_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.UNDEFINED_ID
+import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import com.example.happystudent.core.theme.Green40
+import com.example.happystudent.core.theme.PurpleGrey40
 import com.example.happystudent.core.theme.Red40
 import com.example.happystudent.core.theme.Yellow60
-import com.example.happystudent.feature.students.StudentViewModel.Companion.DEFAULT
-import com.example.happystudent.feature.students.StudentViewModel.Companion.FIRST_PRIORITY
-import com.example.happystudent.feature.students.StudentViewModel.Companion.SECOND_PRIORITY
-import com.example.happystudent.feature.students.StudentViewModel.Companion.THIRD_PRIORITY
-import com.example.happystudent.feature.students.navigation.DEFAULT_STUDENT_ID
+import com.example.happystudent.core.theme.components.FabItem
+import com.example.happystudent.core.theme.components.MultiFabState
+import com.example.happystudent.core.theme.components.MultiFloatingActionButton
+import com.example.happystudent.core.theme.components.rememberMultiFabState
+import com.example.happystudent.core.theme.padding
 import com.example.happystudent.feature.students.util.formatList
 import kotlinx.coroutines.delay
-import java.lang.Exception
 
+
+private const val FAB_ROTATE = 315f
+private const val ONE_STUDENT_FAB_LABEL = "Додати одного студента"
+private const val GROUP_FAB_LABEL = "Додати групу студентів"
+private const val ONE_STUDENT_FAB_ID = 0
+private const val GROUP_FAB_ID = 1
+private const val POSITIONAL_THRESHOLD = 150
+private const val DELETING_DELAY = 800L
+private const val STUDENT_ICON_SIZE = 50
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentListScreen(
     viewModel: StudentViewModel,
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    navigateToBatch: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -88,8 +108,24 @@ fun StudentListScreen(
         mutableStateOf(false)
     }
 
+    var multiFabState by rememberMultiFabState()
+
+    val fabItems = listOf(
+        FabItem(id = ONE_STUDENT_FAB_ID, label = ONE_STUDENT_FAB_LABEL),
+        FabItem(id = GROUP_FAB_ID, label = GROUP_FAB_LABEL)
+    )
+
+
     when (uiState) {
-        is StudentUiState.Empty -> EmptyState(navigateToUpsert = navigateToUpsert)
+
+        is StudentUiState.Empty -> EmptyState(
+            navigateToUpsert = navigateToUpsert,
+            multiFabState = multiFabState,
+            fabItems = fabItems,
+            onStateChanged = { multiFabState = it },
+            navigateToBatch = navigateToBatch
+        )
+
         is StudentUiState.Loading -> LoadingState(navigateToUpsert = navigateToUpsert)
         is StudentUiState.Success -> {
 
@@ -109,10 +145,24 @@ fun StudentListScreen(
                     )
                 },
                 floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
-                    }
+
+                    MultiFloatingActionButton(
+                        state = multiFabState,
+                        onStateChange = {
+                            multiFabState = it
+                        },
+                        mainIconRes = R.drawable.ic_add,
+                        rotateDegree = FAB_ROTATE,
+                        fabItems = fabItems,
+                        onItemClicked = { fabItem ->
+                            if (fabItem.label == ONE_STUDENT_FAB_LABEL) {
+                                navigateToUpsert(UNDEFINED_ID)
+                            } else {
+                                navigateToBatch()
+                            }
+                        }
+                    )
+
                 }
             ) { innerPadding ->
                 FilterBottomSheet(
@@ -189,21 +239,28 @@ fun PriorityChips(
 ) {
 
     val priorities = listOf(
-        DEFAULT, FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
+        ALL, UNDEFINED_PRIORITY, FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
     )
 
     Text(
         modifier = Modifier
-            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
-        text = "Фільтр по пріоритетам"
+            .padding(
+                top = MaterialTheme.padding.small,
+                bottom =MaterialTheme.padding.small,
+                start = MaterialTheme.padding.medium
+            ),
+        text = stringResource(R.string.priority_filter)
     )
 
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, bottom = 16.dp),
+            .padding(
+                start = MaterialTheme.padding.medium,
+                bottom = MaterialTheme.padding.medium
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small)
     ) {
 
         items(priorities) { priority ->
@@ -211,7 +268,7 @@ fun PriorityChips(
                 selected = filter == priority,
                 onClick = {
                     val filterType =
-                        if (priority == DEFAULT) FilterType.DEFAULT
+                        if (priority == ALL) FilterType.ALL
                         else FilterType.BY_PRIORITY
 
                     onUpdateFilterPreferences(priority, filterType)
@@ -235,16 +292,23 @@ fun GroupChips(
 
     Text(
         modifier = Modifier
-            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
-        text = "Фільтр по групам"
+            .padding(
+                top = MaterialTheme.padding.small,
+                bottom = MaterialTheme.padding.small,
+                start = MaterialTheme.padding.medium
+            ),
+        text = stringResource(R.string.group_filter)
     )
 
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, bottom = 16.dp),
+            .padding(
+                start = MaterialTheme.padding.medium,
+                bottom = MaterialTheme.padding.medium
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small)
     ) {
         items(groups) { group ->
 
@@ -277,18 +341,18 @@ fun StudentListTopBar(
     val shareIntent = Intent.createChooser(sendIntent, null)
 
     TopAppBar(
-        title = { Text(text = "Happy Student") },
+        title = { Text(text = stringResource(R.string.happy_student_top_bar)) },
         actions = {
             IconButton(onClick = { onShowBottomSheet(true) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_filter),
-                    contentDescription = "Фільтр учнів"
+                    contentDescription = stringResource(R.string.student_filter)
                 )
             }
             IconButton(onClick = { startActivity(context, shareIntent, null) }) {
                 Icon(
                     imageVector = Icons.Filled.Share,
-                    contentDescription = "Поділитись списком"
+                    contentDescription = stringResource(R.string.share_student_list)
                 )
             }
         }
@@ -327,6 +391,10 @@ fun StudentList(
     }
 }
 
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentDismissItem(
@@ -343,7 +411,7 @@ fun StudentDismissItem(
                 show = false
                 true
             } else false
-        }, positionalThreshold = { 150.dp.toPx() }
+        }, positionalThreshold = { POSITIONAL_THRESHOLD.dp.toPx() }
     )
 
     AnimatedVisibility(
@@ -368,7 +436,7 @@ fun StudentDismissItem(
 
     LaunchedEffect(show) {
         if (!show) {
-            delay(800)
+            delay(DELETING_DELAY)
             deleteStudent(currentItem.id)
         }
     }
@@ -381,14 +449,14 @@ fun DismissBackground() {
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .padding(12.dp, 8.dp),
+            .padding(MaterialTheme.padding.medium, MaterialTheme.padding.small),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
         Icon(
             Icons.Default.Delete,
-            contentDescription = "delete"
+            contentDescription = stringResource(R.string.delete_student)
         )
 
     }
@@ -412,8 +480,9 @@ fun StudentCard(
 
     val color by remember {
         mutableStateOf(
-            if (student.leaving_probability > 70) Red40
-            else if (student.leaving_probability > 40) Yellow60
+            if (student.leaving_probability > CRITICAL_PROB) Red40
+            else if (student.leaving_probability > IMPORTANT_PROB) Yellow60
+            else if (student.leaving_probability <= ZERO_PROB) PurpleGrey40
             else Green40
         )
     }
@@ -433,11 +502,11 @@ fun StudentCard(
         leadingContent = {
             AsyncImage(
                 modifier = Modifier
-                    .size(50.dp)
+                    .size(STUDENT_ICON_SIZE.dp)
                     .clip(CircleShape),
                 model = student.imageUri.toUri(),
                 error = painterResource(id = R.drawable.avatar_placeholder),
-                contentDescription = "Фото студента",
+                contentDescription = stringResource(id = R.string.student_photo),
                 contentScale = ContentScale.Crop
             )
         },
@@ -446,7 +515,7 @@ fun StudentCard(
 
                 Text(
                     modifier = Modifier
-                        .padding(bottom = 8.dp)
+                        .padding(bottom = MaterialTheme.padding.small)
                         .background(
                             color = color,
                             shape = MaterialTheme.shapes.extraSmall
@@ -472,8 +541,8 @@ fun LoadingState(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
+                onClick = { navigateToUpsert(UNDEFINED_ID) }) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add_student))
             }
         }
     ) { innerPadding ->
@@ -493,15 +562,28 @@ fun LoadingState(
 
 @Composable
 fun EmptyState(
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    navigateToBatch: () -> Unit,
+    multiFabState: MultiFabState,
+    fabItems: List<FabItem>,
+    onStateChanged: (MultiFabState) -> Unit
 ) {
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigateToUpsert(DEFAULT_STUDENT_ID) }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new student")
-            }
+            MultiFloatingActionButton(
+                state = multiFabState,
+                onStateChange = {
+                    onStateChanged(it)
+                },
+                mainIconRes = R.drawable.ic_add,
+                rotateDegree = FAB_ROTATE,
+                fabItems = fabItems,
+                onItemClicked = { fabItem ->
+                    if (fabItem.label == ONE_STUDENT_FAB_LABEL) navigateToUpsert(UNDEFINED_ID)
+                    else navigateToBatch()
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -512,7 +594,7 @@ fun EmptyState(
             verticalArrangement = Arrangement.Center
         ) {
 
-            Text(text = "Немає учнів")
+            Text(text = stringResource(R.string.empty_student_list))
 
         }
     }

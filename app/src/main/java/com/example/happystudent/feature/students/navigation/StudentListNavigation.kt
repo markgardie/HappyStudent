@@ -8,9 +8,6 @@ import com.example.happystudent.feature.students.StudentViewModel
 
 const val studentListRoute = "student_list"
 
-fun NavController.navigateToList() {
-    this.navigate(studentListRoute)
-}
 
 fun NavController.navigateBackToList() {
     this.popBackStack()
@@ -18,7 +15,8 @@ fun NavController.navigateBackToList() {
 
 fun NavGraphBuilder.studentListScreen(
     viewModel: StudentViewModel,
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    navigateToBatch: () -> Unit
 ) {
     composable(
         route = studentListRoute
@@ -26,7 +24,8 @@ fun NavGraphBuilder.studentListScreen(
 
         StudentListScreen(
             viewModel = viewModel,
-            navigateToUpsert = navigateToUpsert
+            navigateToUpsert = navigateToUpsert,
+            navigateToBatch = navigateToBatch
         )
     }
 

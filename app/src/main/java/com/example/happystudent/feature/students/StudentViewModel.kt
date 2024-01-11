@@ -7,6 +7,13 @@ import com.example.happystudent.core.data.repository.StudentRepository
 import com.example.happystudent.core.datastore.DefaultFilterPreferencesRepository
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.core.model.Student.Companion.CRITICAL_PROB
+import com.example.happystudent.core.model.Student.Companion.FIRST_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.IMPORTANT_PROB
+import com.example.happystudent.core.model.Student.Companion.SECOND_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.THIRD_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PRIORITY
+import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +50,7 @@ class StudentViewModel @Inject constructor(
 
         val priority = if (student.leaving_probability > CRITICAL_PROB) FIRST_PRIORITY
         else if (student.leaving_probability > IMPORTANT_PROB) SECOND_PRIORITY
+        else if (student.leaving_probability <= ZERO_PROB) UNDEFINED_PRIORITY
         else THIRD_PRIORITY
 
         viewModelScope.launch {
@@ -54,6 +62,27 @@ class StudentViewModel @Inject constructor(
         viewModelScope.launch {
             repository.deleteStudent(studentId)
         }
+    }
+
+    fun batchInsert(
+        insertDate: String,
+        group: String,
+        studentListString: String
+    ) {
+
+        studentListString
+            .split(",\\s+|\\s+,\\s+|\\s+|,".toRegex())
+            .forEach {
+                upsertStudent(
+                    Student(
+                        name = it,
+                        update_date = insertDate,
+                        group = group
+                    )
+                )
+            }
+
+
     }
 
     fun updateFilterPreferences(
@@ -88,19 +117,6 @@ class StudentViewModel @Inject constructor(
         .keys
         .toList()
 
-
-    companion object {
-
-        const val CRITICAL_PROB = 70
-        const val IMPORTANT_PROB = 40
-
-        const val DEFAULT = "Всі"
-        const val FIRST_PRIORITY = "Критично"
-        const val SECOND_PRIORITY = "Варті уваги"
-        const val THIRD_PRIORITY = "Задовільно"
-
-
-    }
 
 }
 
