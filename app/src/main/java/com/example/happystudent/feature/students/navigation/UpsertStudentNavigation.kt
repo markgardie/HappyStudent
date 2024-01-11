@@ -5,15 +5,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.happystudent.core.model.Student.Companion.UNDEFINED_ID
 import com.example.happystudent.feature.students.StudentViewModel
 import com.example.happystudent.feature.students.UpsertStudentScreen
 
 const val STUDENT_ID_ARG = "student_id"
 const val upsertStudentRoute = "upsert_student/{$STUDENT_ID_ARG}"
 const val LEAVING_PROB_KEY = "leaving_prob_key"
-
-const val DEFAULT_STUDENT_ID = 0
-const val DEFAULT_PROBABILITY = 0.0
 
 fun NavController.navigateToUpsertStudent(studentId: Int) {
     this.navigate("upsert_student/$studentId")
@@ -41,13 +39,11 @@ fun NavGraphBuilder.upsertStudentScreen(
         )
     ) { backStackEntry ->
         val studentId = backStackEntry.arguments?.getInt(STUDENT_ID_ARG)
-        val probability = backStackEntry.savedStateHandle.get<Double>(LEAVING_PROB_KEY)
 
         UpsertStudentScreen(
             viewModel = viewModel,
-            studentId = studentId ?: DEFAULT_STUDENT_ID,
+            studentId = studentId ?: UNDEFINED_ID,
             navigateToSurvey = navigateToSurvey,
-            probability = probability ?: DEFAULT_PROBABILITY,
             navigateBackToList = navigateBackToList
         )
     }

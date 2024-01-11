@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -17,11 +18,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.happystudent.R
 import com.example.happystudent.core.theme.components.NavBackTopBar
+import com.example.happystudent.core.theme.padding
 import java.text.DateFormat
 import java.util.Date
+
+
+private const val TEXT_FIELD_WIDTH = 300
 
 @Composable
 fun BatchInsertScreen(
@@ -52,28 +59,28 @@ fun BatchInsertScreen(
         ) {
 
             Text(
-                text = "Введіть імена учнів через такі розділювачі: кома, пробіл, перенос на наступну строку",
+                text = stringResource(id = R.string.batch_insert_instruction),
                 textAlign = TextAlign.Start,
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .width(300.dp)
+                    .padding(horizontal = MaterialTheme.padding.medium)
+                    .width(TEXT_FIELD_WIDTH.dp)
             )
 
             OutlinedTextField(
                 value = groupNameText,
                 onValueChange = { groupNameText = it },
                 modifier = Modifier
-                    .padding(vertical = 24.dp)
-                    .width(300.dp),
-                label = { Text(text = "Назва групи") }
+                    .padding(vertical = MaterialTheme.padding.large)
+                    .width(TEXT_FIELD_WIDTH.dp),
+                label = { Text(text = stringResource(id = R.string.group_name)) }
             )
 
             OutlinedTextField(
                 value = studentListString,
                 onValueChange = { studentListString = it },
-                label = { Text(text = "Список студентів") },
+                label = { Text(text = stringResource(id = R.string.student_list)) },
                 modifier = Modifier
-                    .width(300.dp),
+                    .width(TEXT_FIELD_WIDTH.dp),
             )
 
             Button(
@@ -92,10 +99,10 @@ fun BatchInsertScreen(
                     navigateBackToList()
 
                 },
-                modifier = Modifier.padding(vertical = 32.dp)
+                modifier = Modifier.padding(vertical = MaterialTheme.padding.large)
 
             ) {
-                Text(text = "Додати")
+                Text(text = stringResource(id = R.string.add))
             }
         }
 

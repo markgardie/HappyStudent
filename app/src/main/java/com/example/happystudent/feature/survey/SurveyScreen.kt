@@ -25,9 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.core.model.SurveyItem
+import com.example.happystudent.core.theme.padding
 import kotlinx.coroutines.launch
 
 @Composable
@@ -89,7 +89,7 @@ fun Survey(
         LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = MaterialTheme.padding.small),
             progress = surveyProgress,
             color = MaterialTheme.colorScheme.tertiary
         )
@@ -178,7 +178,7 @@ fun SurveyItemComponent(
         Column(
             modifier = Modifier
                 .selectableGroup()
-                .padding(vertical = 36.dp)
+                .padding(vertical = MaterialTheme.padding.large)
         ) {
 
             surveyItem.answers.forEachIndexed { answerIndex, _ ->
@@ -190,7 +190,7 @@ fun SurveyItemComponent(
                             onClick = { onAnswerSelect(answerIndex) },
                             role = Role.RadioButton
                         )
-                        .padding(horizontal = 36.dp),
+                        .padding(horizontal = MaterialTheme.padding.large),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
@@ -201,7 +201,7 @@ fun SurveyItemComponent(
                     Text(
                         text = surveyItem.answers[answerIndex],
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier.padding(start = MaterialTheme.padding.medium)
                     )
 
                 }

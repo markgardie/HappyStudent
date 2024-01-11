@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">HappyStudent</string>
+    <string name="batch_insert_instruction">Введіть імена учнів через такі розділювачі: кома, пробіл, перенос на наступну строку</string>
+    <string name="group_name">Назва групи</string>
+    <string name="student_list">Список студентів</string>
+    <string name="add">Додати</string>
+    <string name="student_photo">Фото студента</string>
+    <string name="delete_photo">Видалити фото</string>
+    <string name="student_name">Ім\'я</string>
+    <string name="probability">Вірогідність відвалу</string>
+    <string name="evaluate_student">Оцінити учня</string>
+    <string name="save">Зберегти</string>
+    <string name="priority_filter">Фільтр по пріоритетам</string>
+    <string name="group_filter">Фільтр по групам</string>
+    <string name="happy_student_top_bar">Happy Student</string>
+    <string name="student_filter">Фільтр учнів</string>
+    <string name="share_student_list">Поділитись списком</string>
+    <string name="delete_student">Видалити студента</string>
+    <string name="add_student">Додати студента</string>
+    <string name="empty_student_list">Немає учнів</string>
 </resources>
