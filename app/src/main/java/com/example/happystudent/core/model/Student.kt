@@ -3,17 +3,16 @@ package com.example.happystudent.core.model
 data class Student(
     val id: Int = UNDEFINED_ID,
     val name: String,
-    val leaving_probability: Double = UNDEFINED_PROBABILITY,
+    val leaving_probability: Double = ZERO_PROB,
     val group: String = "",
     val update_date: String,
     var imageUri: String = "",
-    val priority: String = ""
+    val priority: String = UNDEFINED_PRIORITY
 ) {
 
     companion object {
 
         const val UNDEFINED_ID = 0
-        const val UNDEFINED_PROBABILITY = 0.0
 
         const val CRITICAL_PROB = 70.0
         const val IMPORTANT_PROB = 40.0

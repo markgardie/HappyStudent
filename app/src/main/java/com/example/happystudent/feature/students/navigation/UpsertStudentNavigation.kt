@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.happystudent.core.model.Student.Companion.UNDEFINED_ID
-import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PROBABILITY
 import com.example.happystudent.feature.students.StudentViewModel
 import com.example.happystudent.feature.students.UpsertStudentScreen
 
@@ -40,13 +39,11 @@ fun NavGraphBuilder.upsertStudentScreen(
         )
     ) { backStackEntry ->
         val studentId = backStackEntry.arguments?.getInt(STUDENT_ID_ARG)
-        val probability = backStackEntry.savedStateHandle.get<Double>(LEAVING_PROB_KEY)
 
         UpsertStudentScreen(
             viewModel = viewModel,
             studentId = studentId ?: UNDEFINED_ID,
             navigateToSurvey = navigateToSurvey,
-            probability = probability ?: UNDEFINED_PROBABILITY,
             navigateBackToList = navigateBackToList
         )
     }

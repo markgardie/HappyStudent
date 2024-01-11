@@ -41,7 +41,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.happystudent.R
 import com.example.happystudent.core.model.Student
-import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PROBABILITY
 import com.example.happystudent.core.theme.components.NavBackTopBar
 import com.example.happystudent.core.theme.padding
 import java.text.DateFormat
@@ -51,7 +50,6 @@ import java.util.Date
 fun UpsertStudentScreen(
     viewModel: StudentViewModel,
     studentId: Int,
-    probability: Double,
     navigateToSurvey: () -> Unit,
     navigateBackToList: () -> Unit
 ) {
@@ -71,11 +69,7 @@ fun UpsertStudentScreen(
     }
 
     var probabilityText by remember {
-        mutableStateOf(
-            if (probability == UNDEFINED_PROBABILITY) {
-                student?.leaving_probability?.toString() ?: "0.0"
-            } else probability.toString()
-        )
+        mutableStateOf(student?.leaving_probability?.toString() ?: "0.0")
     }
 
     var imageUri by rememberSaveable {
