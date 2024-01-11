@@ -41,18 +41,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.happystudent.R
 import com.example.happystudent.core.model.Student
+import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import com.example.happystudent.core.theme.components.NavBackTopBar
 import com.example.happystudent.core.theme.padding
 import java.text.DateFormat
 import java.util.Date
 
 
-private const val STUDEN_PHOTO_SIZE = 150
+private const val STUDENT_PHOTO_SIZE = 150
 
 @Composable
 fun UpsertStudentScreen(
     viewModel: StudentViewModel,
     studentId: Int,
+    evaluatedProb: Double,
     navigateToSurvey: () -> Unit,
     navigateBackToList: () -> Unit
 ) {
@@ -72,7 +74,11 @@ fun UpsertStudentScreen(
     }
 
     var probabilityText by remember {
-        mutableStateOf(student?.leaving_probability?.toString() ?: "0.0")
+       mutableStateOf(
+           if (evaluatedProb <= ZERO_PROB) {
+               student?.leaving_probability?.toString() ?: "0.0"
+           } else evaluatedProb.toString()
+       )
     }
 
     var imageUri by rememberSaveable {
@@ -123,7 +129,7 @@ fun UpsertStudentScreen(
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             )
                         }
-                        .size(STUDEN_PHOTO_SIZE.dp)
+                        .size(STUDENT_PHOTO_SIZE.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )

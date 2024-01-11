@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.happystudent.core.model.Student.Companion.UNDEFINED_ID
+import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import com.example.happystudent.feature.students.StudentViewModel
 import com.example.happystudent.feature.students.UpsertStudentScreen
 
@@ -39,10 +40,12 @@ fun NavGraphBuilder.upsertStudentScreen(
         )
     ) { backStackEntry ->
         val studentId = backStackEntry.arguments?.getInt(STUDENT_ID_ARG)
+        val evaluatedProb = backStackEntry.savedStateHandle.get<Double>(LEAVING_PROB_KEY)
 
         UpsertStudentScreen(
             viewModel = viewModel,
             studentId = studentId ?: UNDEFINED_ID,
+            evaluatedProb = evaluatedProb ?: ZERO_PROB,
             navigateToSurvey = navigateToSurvey,
             navigateBackToList = navigateBackToList
         )
