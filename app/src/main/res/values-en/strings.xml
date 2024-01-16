@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">HappyStudent</string>
+    <string name="batch_insert_instruction">Enter students\' names using the following separators: comma, space, newline</string>
+    <string name="group_name">Group name</string>
+    <string name="student_list">Student list</string>
+    <string name="add">Add</string>
+    <string name="student_photo">Student photo</string>
+    <string name="delete_photo">Delete photo</string>
+    <string name="student_name">Name</string>
+    <string name="probability">Leaving probability</string>
+    <string name="evaluate_student">Evaluate a student</string>
+    <string name="save">Save</string>
+    <string name="priority_filter">Filter by priority</string>
+    <string name="group_filter">Filter by groups</string>
+    <string name="happy_student_top_bar">Happy Student</string>
+    <string name="student_filter">Students filter</string>
+    <string name="share_student_list">Share a list</string>
+    <string name="delete_student">Delete student</string>
+    <string name="add_student">Add student</string>
+    <string name="empty_student_list">Student list is empty</string>
+    <string name="add_a_student">Add a student</string>
+    <string name="add_a_group">Add a group</string>
+</resources>

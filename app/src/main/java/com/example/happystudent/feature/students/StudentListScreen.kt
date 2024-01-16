@@ -85,8 +85,6 @@ import kotlinx.coroutines.delay
 
 
 private const val FAB_ROTATE = 315f
-private const val ONE_STUDENT_FAB_LABEL = "Додати одного студента"
-private const val GROUP_FAB_LABEL = "Додати групу студентів"
 private const val ONE_STUDENT_FAB_ID = 0
 private const val GROUP_FAB_ID = 1
 private const val POSITIONAL_THRESHOLD = 150
@@ -111,8 +109,8 @@ fun StudentListScreen(
     var multiFabState by rememberMultiFabState()
 
     val fabItems = listOf(
-        FabItem(id = ONE_STUDENT_FAB_ID, label = ONE_STUDENT_FAB_LABEL),
-        FabItem(id = GROUP_FAB_ID, label = GROUP_FAB_LABEL)
+        FabItem(id = ONE_STUDENT_FAB_ID, label = stringResource(R.string.add_a_student)),
+        FabItem(id = GROUP_FAB_ID, label = stringResource(R.string.add_a_group))
     )
 
 
@@ -155,7 +153,7 @@ fun StudentListScreen(
                         rotateDegree = FAB_ROTATE,
                         fabItems = fabItems,
                         onItemClicked = { fabItem ->
-                            if (fabItem.label == ONE_STUDENT_FAB_LABEL) {
+                            if (fabItem.id == ONE_STUDENT_FAB_ID) {
                                 navigateToUpsert(UNDEFINED_ID)
                             } else {
                                 navigateToBatch()
@@ -580,7 +578,7 @@ fun EmptyState(
                 rotateDegree = FAB_ROTATE,
                 fabItems = fabItems,
                 onItemClicked = { fabItem ->
-                    if (fabItem.label == ONE_STUDENT_FAB_LABEL) navigateToUpsert(UNDEFINED_ID)
+                    if (fabItem.id == ONE_STUDENT_FAB_ID) navigateToUpsert(UNDEFINED_ID)
                     else navigateToBatch()
                 }
             )
