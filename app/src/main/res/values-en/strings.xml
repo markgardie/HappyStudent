@@ -20,4 +20,7 @@
     <string name="empty_student_list">Student list is empty</string>
     <string name="add_a_student">Add a student</string>
     <string name="add_a_group">Add a group</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="complete">Complete</string>
 </resources>

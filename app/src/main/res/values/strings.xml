@@ -20,4 +20,7 @@
     <string name="empty_student_list">Немає учнів</string>
     <string name="add_a_student">Додати одного студента</string>
     <string name="add_a_group">Додати групу студентів</string>
+    <string name="previous">Назад</string>
+    <string name="next">Далі</string>
+    <string name="complete">Завершити</string>
 </resources>

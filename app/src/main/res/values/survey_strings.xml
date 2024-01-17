@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="interest">Наскільки учню цікаво навчатись?</string>
+    <string name="interest_ans1">Дуже цікаво</string>
+    <string name="interets_ans2">Переважно цікаво</string>
+    <string name="interest_ans3">Цікаві тільки окремі теми</string>
+    <string name="interest_ans4">Зовсім нецікаво</string>
+    <string name="duration">Як довго навчається в школі?</string>
+    <string name="duration_ans1">Декілька років</string>
+    <string name="duration_ans2">Один рік</string>
+    <string name="duration_ans3">Півроку</string>
+    <string name="duration_ans4">Декілька місяців</string>
+    <string name="duration_ans5">Перший місяць</string>
+    <string name="teacher">Як довго навчається у вас?</string>
+    <string name="mood">Який настрій в учня на уроці?</string>
+    <string name="mood_ans1">Піднесений, веселий</string>
+    <string name="mood_ans2">Спокійний</string>
+    <string name="mood_ans3">Нудно</string>
+    <string name="mood_ans4">Засмучується, не хоче ходити на уроки</string>
+    <string name="behavior">Як учень поводить себе на уроці?</string>
+    <string name="behavior_ans1">Слухняний</string>
+    <string name="behavior_ans2">Іноді погана поведінка</string>
+    <string name="behavior_ans3">Переважно погана поведінка</string>
+    <string name="classwork">Як учень працює на уроці?</string>
+    <string name="classwork_ans1">Завжди активний</string>
+    <string name="classwork_ans2">Переважно активний</string>
+    <string name="classwork_ans3">Іноді активний</string>
+    <string name="classwork_ans4">Зовсім неактивний</string>
+    <string name="homework">Як часто учень виконує домашнє завдання?</string>
+    <string name="homework_ans1">Постійно</string>
+    <string name="homework_ans2">Регулярно, але не завжди</string>
+    <string name="homework_ans3">Іноді</string>
+    <string name="homework_ans4">Ніколи</string>
+    <string name="relationship">Стосунки учня з іншими дітьми в групі</string>
+    <string name="relationship_ans1">Товариські з більшістю групи</string>
+    <string name="relationship_ans2">Є декілька друзів</string>
+    <string name="relationship_ans3">Нейтральні</string>
+    <string name="relationship_ans4">Є невеликі конфлікти</string>
+    <string name="relationship_ans5">Присутні серйозні конфлікти</string>
+</resources>
