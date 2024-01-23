@@ -18,4 +18,14 @@
     <string name="delete_student">Видалити студента</string>
     <string name="add_student">Додати студента</string>
     <string name="empty_student_list">Немає учнів</string>
+    <string name="add_a_student">Додати одного студента</string>
+    <string name="add_a_group">Додати групу студентів</string>
+    <string name="previous">Назад</string>
+    <string name="next">Далі</string>
+    <string name="complete">Завершити</string>
+    <string name="reset_filters">Скинути фільтр</string>
+    <string name="priority_undefined">Неоцінено</string>
+    <string name="priority_first">Критично</string>
+    <string name="priority_second">Варті уваги</string>
+    <string name="priority_third">Задовільно</string>
 </resources>

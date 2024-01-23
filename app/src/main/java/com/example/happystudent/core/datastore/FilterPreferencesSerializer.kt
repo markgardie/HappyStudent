@@ -2,7 +2,6 @@ package com.example.happystudent.core.datastore
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.example.happystudent.core.model.Student.Companion.ALL
 import com.google.protobuf.InvalidProtocolBufferException
 import java.io.InputStream
 import java.io.OutputStream
@@ -11,7 +10,7 @@ object FilterPreferencesSerializer: Serializer<FilterPreferences> {
     override val defaultValue: FilterPreferences =  FilterPreferences
         .getDefaultInstance()
         .toBuilder()
-        .setFilter(ALL)
+        .setFilterType(FilterPreferences.FilterType.NO_FILTER)
         .build()
 
 

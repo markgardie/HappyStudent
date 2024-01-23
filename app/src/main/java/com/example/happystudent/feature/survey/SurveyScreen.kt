@@ -24,8 +24,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.happystudent.R
 import com.example.happystudent.core.model.SurveyItem
 import com.example.happystudent.core.theme.padding
 import kotlinx.coroutines.launch
@@ -56,6 +58,8 @@ fun Survey(
     navigateBackToUpsert: (Double) -> Unit
 ) {
 
+    val nextStringRes = stringResource(R.string.next)
+    val completeStringRes = stringResource(R.string.complete)
 
     var itemIndex by remember {
         mutableIntStateOf(0)
@@ -70,7 +74,7 @@ fun Survey(
     }
 
     var nextText by remember {
-        mutableStateOf("Далі")
+        mutableStateOf(nextStringRes)
     }
 
     val (selectedAnswer, onAnswerSelect) = remember {
@@ -112,12 +116,12 @@ fun Survey(
                     itemIndex--
                     showBackButton = itemIndex != 0
                     surveyProgress = itemIndex / surveyItems.size.toFloat()
-                    nextText = "Далі"
+                    nextText = nextStringRes
                     answersIds.removeLast()
                     onAnswerSelect(-1)
                 }) {
                     Text(
-                        text = "Назад",
+                        text = stringResource(R.string.previous),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -130,7 +134,7 @@ fun Survey(
                 }
                 else if (itemIndex == surveyItems.lastIndex - 1) {
                     itemIndex++
-                    nextText = "Завершити"
+                    nextText = completeStringRes
                 }
                 else {
                     scope.launch {

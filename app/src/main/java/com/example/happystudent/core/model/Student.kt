@@ -1,5 +1,7 @@
 package com.example.happystudent.core.model
 
+import com.example.happystudent.core.datastore.FilterPreferences
+
 data class Student(
     val id: Int = UNDEFINED_ID,
     val name: String,
@@ -7,7 +9,7 @@ data class Student(
     val group: String = "",
     val update_date: String,
     var imageUri: String = "",
-    val priority: String = UNDEFINED_PRIORITY
+    val priority: FilterPreferences.Priority = FilterPreferences.Priority.UNDEFINED
 ) {
 
     companion object {
@@ -17,11 +19,5 @@ data class Student(
         const val CRITICAL_PROB = 70.0
         const val IMPORTANT_PROB = 40.0
         const val ZERO_PROB = 0.0
-
-        const val ALL = "Всі"
-        const val FIRST_PRIORITY = "Критично"
-        const val SECOND_PRIORITY = "Варті уваги"
-        const val THIRD_PRIORITY = "Задовільно"
-        const val UNDEFINED_PRIORITY = "Неоцінено"
     }
 }
