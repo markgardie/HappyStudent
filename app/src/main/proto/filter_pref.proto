@@ -5,12 +5,21 @@ option java_multiple_files = true;
 
 message FilterPreferences {
 
-  string filter = 1;
-  FilterType filter_type = 2;
+  FilterType filter_type = 1;
+  Priority priority = 2;
+  string group = 3;
 
   enum FilterType {
-    ALL = 0;
+    NO_FILTER = 0;
     BY_PRIORITY = 1;
     BY_GROUP = 2;
+  }
+
+  enum Priority {
+    UNDEFINED = 0;
+    ZERO = 1;
+    FIRST = 2;
+    SECOND = 3;
+    THIRD = 4;
   }
 }

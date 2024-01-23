@@ -6,13 +6,10 @@ import com.example.happystudent.core.data.di.OfflineFirstRepository
 import com.example.happystudent.core.data.repository.StudentRepository
 import com.example.happystudent.core.datastore.DefaultFilterPreferencesRepository
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
+import com.example.happystudent.core.datastore.FilterPreferences.Priority
 import com.example.happystudent.core.model.Student
 import com.example.happystudent.core.model.Student.Companion.CRITICAL_PROB
-import com.example.happystudent.core.model.Student.Companion.FIRST_PRIORITY
 import com.example.happystudent.core.model.Student.Companion.IMPORTANT_PROB
-import com.example.happystudent.core.model.Student.Companion.SECOND_PRIORITY
-import com.example.happystudent.core.model.Student.Companion.THIRD_PRIORITY
-import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PRIORITY
 import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,7 +32,8 @@ class StudentViewModel @Inject constructor(
         if (students.isEmpty()) StudentUiState.Empty
         else StudentUiState.Success(
             students = students,
-            filter = preferences.filter,
+            preferenceGroup = preferences.group,
+            preferencePriority = preferences.priority,
             filterType = preferences.filterType
         )
     }
@@ -48,10 +46,11 @@ class StudentViewModel @Inject constructor(
 
     fun upsertStudent(student: Student) {
 
-        val priority = if (student.leaving_probability > CRITICAL_PROB) FIRST_PRIORITY
-        else if (student.leaving_probability > IMPORTANT_PROB) SECOND_PRIORITY
-        else if (student.leaving_probability <= ZERO_PROB) UNDEFINED_PRIORITY
-        else THIRD_PRIORITY
+        val priority =
+            if (student.leaving_probability <= ZERO_PROB) Priority.ZERO
+            else if (student.leaving_probability > CRITICAL_PROB) Priority.FIRST
+            else if (student.leaving_probability > IMPORTANT_PROB) Priority.SECOND
+            else Priority.THIRD
 
         viewModelScope.launch {
             repository.upsertStudent(student.copy(priority = priority))
@@ -86,12 +85,14 @@ class StudentViewModel @Inject constructor(
     }
 
     fun updateFilterPreferences(
-        filter: String,
+        group: String,
+        priority: Priority,
         filterType: FilterType
     ) {
 
         viewModelScope.launch {
-            filterPreferencesRepository.updateFilter(filter)
+            filterPreferencesRepository.updateGroup(group)
+            filterPreferencesRepository.updatePriority(priority)
             filterPreferencesRepository.updateFilterType(filterType)
         }
 
@@ -100,12 +101,13 @@ class StudentViewModel @Inject constructor(
     fun filterStudents(
         students: List<Student>,
         filterType: FilterType,
-        filter: String
+        preferenceGroup: String,
+        preferencePriority: Priority
     ) =
 
         when (filterType) {
-            FilterType.BY_PRIORITY -> students.filter { it.priority == filter }
-            FilterType.BY_GROUP -> students.filter { it.group == filter }
+            FilterType.BY_PRIORITY -> students.filter { it.priority == preferencePriority }
+            FilterType.BY_GROUP -> students.filter { it.group == preferenceGroup }
             else -> students
         }
 
@@ -128,7 +130,8 @@ sealed interface StudentUiState {
 
     data class Success(
         val students: List<Student>,
-        val filter: String,
+        val preferenceGroup: String,
+        val preferencePriority: Priority,
         val filterType: FilterType
     ) : StudentUiState
 }

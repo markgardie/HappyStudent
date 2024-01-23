@@ -37,6 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -61,15 +62,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.happystudent.R
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
+import com.example.happystudent.core.datastore.FilterPreferences.Priority
 import com.example.happystudent.core.model.Student
-import com.example.happystudent.core.model.Student.Companion.ALL
 import com.example.happystudent.core.model.Student.Companion.CRITICAL_PROB
-import com.example.happystudent.core.model.Student.Companion.FIRST_PRIORITY
 import com.example.happystudent.core.model.Student.Companion.IMPORTANT_PROB
-import com.example.happystudent.core.model.Student.Companion.SECOND_PRIORITY
-import com.example.happystudent.core.model.Student.Companion.THIRD_PRIORITY
 import com.example.happystudent.core.model.Student.Companion.UNDEFINED_ID
-import com.example.happystudent.core.model.Student.Companion.UNDEFINED_PRIORITY
 import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import com.example.happystudent.core.theme.Green40
 import com.example.happystudent.core.theme.PurpleGrey40
@@ -137,7 +134,8 @@ fun StudentListScreen(
                             .filterStudents(
                                 (uiState as StudentUiState.Success).students,
                                 (uiState as StudentUiState.Success).filterType,
-                                (uiState as StudentUiState.Success).filter
+                                (uiState as StudentUiState.Success).preferenceGroup,
+                                (uiState as StudentUiState.Success).preferencePriority
                             )
                             .formatList()
                     )
@@ -170,7 +168,8 @@ fun StudentListScreen(
                         showBottomSheet = show
                     },
                     groups = viewModel.getGroups((uiState as StudentUiState.Success).students),
-                    filter = (uiState as StudentUiState.Success).filter,
+                    preferenceGroup = (uiState as StudentUiState.Success).preferenceGroup,
+                    preferencePriority = (uiState as StudentUiState.Success).preferencePriority,
                     onUpdateFilterPreferences = viewModel::updateFilterPreferences
                 )
 
@@ -179,7 +178,8 @@ fun StudentListScreen(
                     students = viewModel.filterStudents(
                         (uiState as StudentUiState.Success).students,
                         (uiState as StudentUiState.Success).filterType,
-                        (uiState as StudentUiState.Success).filter
+                        (uiState as StudentUiState.Success).preferenceGroup,
+                        (uiState as StudentUiState.Success).preferencePriority
                     ),
                     deleteStudent = viewModel::deleteStudent,
                     navigateToUpsert = navigateToUpsert,
@@ -202,9 +202,10 @@ fun FilterBottomSheet(
     showBottomState: Boolean,
     sheetState: SheetState,
     onShowChange: (Boolean) -> Unit,
-    onUpdateFilterPreferences: (String, FilterType) -> Unit,
+    onUpdateFilterPreferences: (String, Priority, FilterType) -> Unit,
     groups: List<String>,
-    filter: String
+    preferenceGroup: String,
+    preferencePriority: Priority
 ) {
 
     if (showBottomState) {
@@ -213,39 +214,48 @@ fun FilterBottomSheet(
             sheetState = sheetState
         ) {
 
-            PriorityChips(
-                onUpdateFilterPreferences = onUpdateFilterPreferences,
-                filter = filter
-            )
+            Column(
+                modifier = Modifier.padding(start = MaterialTheme.padding.medium)
+            ) {
+                TextButton(
+                    onClick = {
+                        onUpdateFilterPreferences("", Priority.UNDEFINED, FilterType.NO_FILTER)
+                    }
+                ) {
+                    Text(text = "Скинути фільтр")
+                }
 
-            GroupChips(
-                groups = groups,
-                onUpdateFilterPreferences = onUpdateFilterPreferences,
-                filter = filter
-            )
+                PriorityChips(
+                    onUpdateFilterPreferences = onUpdateFilterPreferences,
+                    preferencePriority = preferencePriority
+                )
+
+                GroupChips(
+                    groups = groups,
+                    onUpdateFilterPreferences = onUpdateFilterPreferences,
+                    preferenceGroup = preferenceGroup
+                )
+            }
+
+
         }
     }
 
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
 @Composable
 fun PriorityChips(
-    onUpdateFilterPreferences: (String, FilterType) -> Unit,
-    filter: String
+    onUpdateFilterPreferences: (String, Priority, FilterType) -> Unit,
+    preferencePriority: Priority
 ) {
-
-    val priorities = listOf(
-        ALL, UNDEFINED_PRIORITY, FIRST_PRIORITY, SECOND_PRIORITY, THIRD_PRIORITY
-    )
 
     Text(
         modifier = Modifier
             .padding(
                 top = MaterialTheme.padding.small,
-                bottom =MaterialTheme.padding.small,
-                start = MaterialTheme.padding.medium
+                bottom = MaterialTheme.padding.small
             ),
         text = stringResource(R.string.priority_filter)
     )
@@ -254,24 +264,40 @@ fun PriorityChips(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                start = MaterialTheme.padding.medium,
                 bottom = MaterialTheme.padding.medium
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small)
     ) {
 
-        items(priorities) { priority ->
+        items(
+            listOf(
+                Priority.ZERO,
+                Priority.FIRST,
+                Priority.SECOND,
+                Priority.THIRD
+            )
+        ) { priority ->
             FilterChip(
-                selected = filter == priority,
+                selected = preferencePriority == priority,
                 onClick = {
-                    val filterType =
-                        if (priority == ALL) FilterType.ALL
-                        else FilterType.BY_PRIORITY
 
-                    onUpdateFilterPreferences(priority, filterType)
+                    onUpdateFilterPreferences("", priority, FilterType.BY_PRIORITY)
                 },
-                label = { Text(text = priority) }
+                label = {
+
+                    val priorityText =
+                        when (priority) {
+                            Priority.ZERO -> "Неоцінено"
+                            Priority.FIRST -> "Критично"
+                            Priority.SECOND -> "Варті уваги"
+                            Priority.THIRD -> "Задовільно"
+                            else -> ""
+                        }
+
+                    Text(text = priorityText)
+
+                }
             )
         }
 
@@ -284,16 +310,15 @@ fun PriorityChips(
 @Composable
 fun GroupChips(
     groups: List<String>,
-    onUpdateFilterPreferences: (String, FilterType) -> Unit,
-    filter: String
+    onUpdateFilterPreferences: (String, Priority, FilterType) -> Unit,
+    preferenceGroup: String
 ) {
 
     Text(
         modifier = Modifier
             .padding(
                 top = MaterialTheme.padding.small,
-                bottom = MaterialTheme.padding.small,
-                start = MaterialTheme.padding.medium
+                bottom = MaterialTheme.padding.small
             ),
         text = stringResource(R.string.group_filter)
     )
@@ -302,7 +327,6 @@ fun GroupChips(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                start = MaterialTheme.padding.medium,
                 bottom = MaterialTheme.padding.medium
             ),
         verticalAlignment = Alignment.CenterVertically,
@@ -311,9 +335,9 @@ fun GroupChips(
         items(groups) { group ->
 
             FilterChip(
-                selected = group == filter,
+                selected = group == preferenceGroup,
                 onClick = {
-                    onUpdateFilterPreferences(group, FilterType.BY_GROUP)
+                    onUpdateFilterPreferences(group, Priority.UNDEFINED, FilterType.BY_GROUP)
                 },
                 label = { Text(text = group) }
             )
@@ -388,9 +412,6 @@ fun StudentList(
 
     }
 }
-
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -540,7 +561,10 @@ fun LoadingState(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navigateToUpsert(UNDEFINED_ID) }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add_student))
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.add_student)
+                )
             }
         }
     ) { innerPadding ->

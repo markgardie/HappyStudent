@@ -6,7 +6,9 @@ interface FilterPreferencesRepository {
 
     val filterPreferencesFlow: Flow<FilterPreferences>
 
-    suspend fun updateFilter(filter: String)
+    suspend fun updateGroup(group: String)
+
+    suspend fun updatePriority(priority: FilterPreferences.Priority)
 
     suspend fun updateFilterType(filter: FilterPreferences.FilterType)
 }
