@@ -25,11 +25,21 @@ class DefaultFilterPreferencesRepository @Inject constructor(
             }
         }
 
-    override suspend fun updateFilter(filter: String) {
+
+    override suspend fun updateGroup(group: String) {
         filterPreferencesStore.updateData { preferences ->
             preferences
                 .toBuilder()
-                .setFilter(filter)
+                .setGroup(group)
+                .build()
+        }
+    }
+
+    override suspend fun updatePriority(priority: FilterPreferences.Priority) {
+        filterPreferencesStore.updateData { preferences ->
+            preferences
+                .toBuilder()
+                .setPriority(priority)
                 .build()
         }
     }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="interest">How interested is the student in learning?</string>
+    <string name="interest_ans1">Very interested</string>
+    <string name="interets_ans2">Mostly interested</string>
+    <string name="interest_ans3">Interested in specific topics</string>
+    <string name="interest_ans4">Not interested at all</string>
+    <string name="duration">How long has the student  been studying at school?</string>
+    <string name="duration_ans1">Several years</string>
+    <string name="duration_ans2">One year</string>
+    <string name="duration_ans3">Half year</string>
+    <string name="duration_ans4">Several months</string>
+    <string name="duration_ans5">One month</string>
+    <string name="teacher">How long have you been the student\'s teacher?</string>
+    <string name="mood">What is the student\'s mood in class?</string>
+    <string name="mood_ans1">Excited</string>
+    <string name="mood_ans2">Calm</string>
+    <string name="mood_ans3">Bored</string>
+    <string name="mood_ans4">Disappointed</string>
+    <string name="behavior">How does the student behave in class?</string>
+    <string name="behavior_ans1">Good behavior</string>
+    <string name="behavior_ans2">Sometimes bad behavior</string>
+    <string name="behavior_ans3">Moslty bad behavior</string>
+    <string name="classwork">How does the student work in class?</string>
+    <string name="classwork_ans1">Always active</string>
+    <string name="classwork_ans2">Mostly active</string>
+    <string name="classwork_ans3">Sometimes active</string>
+    <string name="classwork_ans4">Not active at all</string>
+    <string name="homework">How often does the student do homework?</string>
+    <string name="homework_ans1">Always</string>
+    <string name="homework_ans2">Regularly</string>
+    <string name="homework_ans3">Sometimes</string>
+    <string name="homework_ans4">Never</string>
+    <string name="relationship">Student\'s relationship with other children in the group</string>
+    <string name="relationship_ans1">Friends with most of the group</string>
+    <string name="relationship_ans2">Friends with some of the group</string>
+    <string name="relationship_ans3">Neutral</string>
+    <string name="relationship_ans4">Some conflicts</string>
+    <string name="relationship_ans5">Major conflicts</string>
+</resources>
