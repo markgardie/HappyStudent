@@ -222,7 +222,7 @@ fun FilterBottomSheet(
                         onUpdateFilterPreferences("", Priority.UNDEFINED, FilterType.NO_FILTER)
                     }
                 ) {
-                    Text(text = "Скинути фільтр")
+                    Text(text = stringResource(R.string.reset_filters))
                 }
 
                 PriorityChips(
@@ -288,10 +288,10 @@ fun PriorityChips(
 
                     val priorityText =
                         when (priority) {
-                            Priority.ZERO -> "Неоцінено"
-                            Priority.FIRST -> "Критично"
-                            Priority.SECOND -> "Варті уваги"
-                            Priority.THIRD -> "Задовільно"
+                            Priority.ZERO -> stringResource(R.string.priority_undefined)
+                            Priority.FIRST -> stringResource(R.string.priority_first)
+                            Priority.SECOND -> stringResource(R.string.priority_second)
+                            Priority.THIRD -> stringResource(R.string.priority_third)
                             else -> ""
                         }
 

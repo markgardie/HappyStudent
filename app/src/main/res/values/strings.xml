@@ -23,4 +23,9 @@
     <string name="previous">Назад</string>
     <string name="next">Далі</string>
     <string name="complete">Завершити</string>
+    <string name="reset_filters">Скинути фільтр</string>
+    <string name="priority_undefined">Неоцінено</string>
+    <string name="priority_first">Критично</string>
+    <string name="priority_second">Варті уваги</string>
+    <string name="priority_third">Задовільно</string>
 </resources>
