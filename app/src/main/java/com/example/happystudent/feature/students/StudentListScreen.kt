@@ -497,14 +497,6 @@ fun StudentCard(
         e.printStackTrace()
     }
 
-    val color by remember {
-        mutableStateOf(
-            if (student.leaving_probability > CRITICAL_PROB) Red40
-            else if (student.leaving_probability > IMPORTANT_PROB) Yellow60
-            else if (student.leaving_probability <= ZERO_PROB) PurpleGrey40
-            else Green40
-        )
-    }
 
     ListItem(
         modifier = Modifier.clickable {
@@ -536,7 +528,10 @@ fun StudentCard(
                     modifier = Modifier
                         .padding(bottom = MaterialTheme.padding.small)
                         .background(
-                            color = color,
+                            color = if (student.leaving_probability > CRITICAL_PROB) Red40
+                            else if (student.leaving_probability > IMPORTANT_PROB) Yellow60
+                            else if (student.leaving_probability <= ZERO_PROB) PurpleGrey40
+                            else Green40,
                             shape = MaterialTheme.shapes.extraSmall
                         ),
                     text = "${student.leaving_probability}%",
