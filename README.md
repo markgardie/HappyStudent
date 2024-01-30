@@ -34,8 +34,11 @@ Teachers can take a survey to evaluate leaving probability.
 - MVVM, ViewModel with one state property (sealed class), UDF, Google Architecture Guidelines. See: 
 
 [Modern Android App Architecture](https://developer.android.com/courses/pathways/android-architecture)
+
 [Recommendations for Android architecture](https://developer.android.com/topic/architecture/recommendations)
+
 [Common modularization patterns](https://developer.android.com/topic/modularization/patterns)
+
 
 - Coroutines, Flow, StateFlow
 - Jetpack Compose, Compose Navigation
