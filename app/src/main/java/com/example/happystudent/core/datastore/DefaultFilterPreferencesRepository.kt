@@ -1,6 +1,5 @@
 package com.example.happystudent.core.datastore
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import kotlinx.coroutines.flow.Flow
@@ -12,13 +11,11 @@ class DefaultFilterPreferencesRepository @Inject constructor(
     private val filterPreferencesStore: DataStore<FilterPreferences>
 ): FilterPreferencesRepository {
 
-    private val TAG: String = "FilterPreferencesRepo"
 
     override val filterPreferencesFlow: Flow<FilterPreferences> = filterPreferencesStore.data
         .catch { exception ->
             // dataStore.data throws an IOException when an error is encountered when reading data
             if (exception is IOException) {
-                Log.e(TAG, "Error reading sort order preferences.", exception)
                 emit(FilterPreferences.getDefaultInstance())
             } else {
                 throw exception
