@@ -38,6 +38,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -109,6 +110,12 @@ fun StudentListScreen(
         FabItem(id = GROUP_FAB_ID, label = stringResource(R.string.add_a_group))
     )
 
+    var allStudentsSelected by remember {
+        mutableStateOf(false)
+    }
+
+
+
 
     when (uiState) {
 
@@ -122,6 +129,14 @@ fun StudentListScreen(
 
         is StudentUiState.Loading -> LoadingState(navigateToUpsert = navigateToUpsert)
         is StudentUiState.Success -> {
+
+            LaunchedEffect(key1 = allStudentsSelected) {
+                selectedStudentsForDelete =
+                    if (allStudentsSelected)
+                        selectedStudentsForDelete.plus((uiState as StudentUiState.Success).students)
+                    else
+                        selectedStudentsForDelete.minus((uiState as StudentUiState.Success).students.toSet())
+            }
 
             Scaffold(
                 topBar = {
@@ -141,7 +156,9 @@ fun StudentListScreen(
                         onLongPressEnabledChange = onLongPressEnabledChange,
                         selectedStudentsForDelete = selectedStudentsForDelete,
                         deleteStudent = viewModel::deleteStudent,
-                        onClearStudentsForDelete = { selectedStudentsForDelete = emptyList() }
+                        onClearStudentsForDelete = { selectedStudentsForDelete = emptyList() },
+                        allStudentsSelected = allStudentsSelected,
+                        onChangeAllStudentsSelected = { allStudentsSelected = it },
                     )
                 },
                 floatingActionButton = {
@@ -369,7 +386,9 @@ fun StudentListTopBar(
     onLongPressEnabledChange: (Boolean) -> Unit,
     onClearStudentsForDelete: () -> Unit,
     selectedStudentsForDelete: List<Student>,
-    deleteStudent: (Int) -> Unit
+    deleteStudent: (Int) -> Unit,
+    allStudentsSelected: Boolean,
+    onChangeAllStudentsSelected: (Boolean) -> Unit,
 ) {
 
     val context = LocalContext.current
@@ -383,7 +402,20 @@ fun StudentListTopBar(
 
     TopAppBar(
         title = {
-            if (!isLongPressEnabled) Text(text = stringResource(R.string.happy_student_top_bar))
+            if (!isLongPressEnabled) {
+                Text(text = stringResource(R.string.happy_student_top_bar))
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = allStudentsSelected,
+                        onCheckedChange = onChangeAllStudentsSelected,
+                    )
+
+                    Text(text = stringResource(R.string.select_all))
+                }
+            }
         },
         actions = {
             if (!isLongPressEnabled) {
