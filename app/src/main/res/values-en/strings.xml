@@ -28,4 +28,5 @@
     <string name="priority_first">Critical</string>
     <string name="priority_second">Important</string>
     <string name="priority_third">OK</string>
+    <string name="select_all">Select all</string>
 </resources>

@@ -28,4 +28,5 @@
     <string name="priority_first">Критично</string>
     <string name="priority_second">Варті уваги</string>
     <string name="priority_third">Задовільно</string>
+    <string name="select_all">Обрати все</string>
 </resources>

@@ -1,11 +1,9 @@
 package com.example.happystudent.feature.students
 
 import android.content.Intent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,11 +18,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -35,18 +33,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDismissState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,14 +73,11 @@ import com.example.happystudent.core.theme.components.MultiFloatingActionButton
 import com.example.happystudent.core.theme.components.rememberMultiFabState
 import com.example.happystudent.core.theme.padding
 import com.example.happystudent.feature.students.util.formatList
-import kotlinx.coroutines.delay
 
 
 private const val FAB_ROTATE = 315f
 private const val ONE_STUDENT_FAB_ID = 0
 private const val GROUP_FAB_ID = 1
-private const val POSITIONAL_THRESHOLD = 150
-private const val DELETING_DELAY = 800L
 private const val STUDENT_ICON_SIZE = 50
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,12 +95,26 @@ fun StudentListScreen(
         mutableStateOf(false)
     }
 
+    var isLongPressEnabled by remember {
+        mutableStateOf(false)
+    }
+    val onLongPressEnabledChange = { value: Boolean -> isLongPressEnabled = value }
+    var selectedStudentsForDelete by remember {
+        mutableStateOf<List<Student>>(emptyList())
+    }
+
     var multiFabState by rememberMultiFabState()
 
     val fabItems = listOf(
         FabItem(id = ONE_STUDENT_FAB_ID, label = stringResource(R.string.add_a_student)),
         FabItem(id = GROUP_FAB_ID, label = stringResource(R.string.add_a_group))
     )
+
+    var allStudentsSelected by remember {
+        mutableStateOf(false)
+    }
+
+
 
 
     when (uiState) {
@@ -124,6 +130,14 @@ fun StudentListScreen(
         is StudentUiState.Loading -> LoadingState(navigateToUpsert = navigateToUpsert)
         is StudentUiState.Success -> {
 
+            LaunchedEffect(key1 = allStudentsSelected) {
+                selectedStudentsForDelete =
+                    if (allStudentsSelected)
+                        selectedStudentsForDelete.plus((uiState as StudentUiState.Success).students)
+                    else
+                        selectedStudentsForDelete.minus((uiState as StudentUiState.Success).students.toSet())
+            }
+
             Scaffold(
                 topBar = {
                     StudentListTopBar(
@@ -137,7 +151,14 @@ fun StudentListScreen(
                                 (uiState as StudentUiState.Success).preferenceGroup,
                                 (uiState as StudentUiState.Success).preferencePriority
                             )
-                            .formatList()
+                            .formatList(),
+                        isLongPressEnabled = isLongPressEnabled,
+                        onLongPressEnabledChange = onLongPressEnabledChange,
+                        selectedStudentsForDelete = selectedStudentsForDelete,
+                        deleteStudent = viewModel::deleteStudent,
+                        onClearStudentsForDelete = { selectedStudentsForDelete = emptyList() },
+                        allStudentsSelected = allStudentsSelected,
+                        onChangeAllStudentsSelected = { allStudentsSelected = it },
                     )
                 },
                 floatingActionButton = {
@@ -181,9 +202,19 @@ fun StudentListScreen(
                         (uiState as StudentUiState.Success).preferenceGroup,
                         (uiState as StudentUiState.Success).preferencePriority
                     ),
-                    deleteStudent = viewModel::deleteStudent,
                     navigateToUpsert = navigateToUpsert,
-                    innerPadding = innerPadding
+                    innerPadding = innerPadding,
+                    isLongPressEnabled = isLongPressEnabled,
+                    onLongPressEnabledChange = onLongPressEnabledChange,
+                    selectedStudentsForDelete = selectedStudentsForDelete,
+                    onStudentSelectForDelete = { student ->
+                        selectedStudentsForDelete =
+                            if (selectedStudentsForDelete.contains(student)) {
+                                selectedStudentsForDelete.minus(student)
+                            } else {
+                                selectedStudentsForDelete.plus(student)
+                            }
+                    }
                 )
             }
 
@@ -350,7 +381,14 @@ fun GroupChips(
 @Composable
 fun StudentListTopBar(
     onShowBottomSheet: (Boolean) -> Unit,
-    shareText: String
+    shareText: String,
+    isLongPressEnabled: Boolean,
+    onLongPressEnabledChange: (Boolean) -> Unit,
+    onClearStudentsForDelete: () -> Unit,
+    selectedStudentsForDelete: List<Student>,
+    deleteStudent: (Int) -> Unit,
+    allStudentsSelected: Boolean,
+    onChangeAllStudentsSelected: (Boolean) -> Unit,
 ) {
 
     val context = LocalContext.current
@@ -363,19 +401,60 @@ fun StudentListTopBar(
     val shareIntent = Intent.createChooser(sendIntent, null)
 
     TopAppBar(
-        title = { Text(text = stringResource(R.string.happy_student_top_bar)) },
-        actions = {
-            IconButton(onClick = { onShowBottomSheet(true) }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_filter),
-                    contentDescription = stringResource(R.string.student_filter)
-                )
+        title = {
+            if (!isLongPressEnabled) {
+                Text(text = stringResource(R.string.happy_student_top_bar))
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = allStudentsSelected,
+                        onCheckedChange = onChangeAllStudentsSelected,
+                    )
+
+                    Text(text = stringResource(R.string.select_all))
+                }
             }
-            IconButton(onClick = { startActivity(context, shareIntent, null) }) {
-                Icon(
-                    imageVector = Icons.Filled.Share,
-                    contentDescription = stringResource(R.string.share_student_list)
-                )
+        },
+        actions = {
+            if (!isLongPressEnabled) {
+                IconButton(onClick = { onShowBottomSheet(true) }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_filter),
+                        contentDescription = stringResource(R.string.student_filter)
+                    )
+                }
+                IconButton(onClick = { startActivity(context, shareIntent, null) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Share,
+                        contentDescription = stringResource(R.string.share_student_list)
+                    )
+                }
+            } else {
+                IconButton(onClick = {
+                    selectedStudentsForDelete.forEach {
+                        deleteStudent(it.id)
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = null
+                    )
+                }
+            }
+        },
+        navigationIcon = {
+            if (isLongPressEnabled) {
+                IconButton(onClick = {
+                    onLongPressEnabledChange(false)
+                    onClearStudentsForDelete()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = null
+                    )
+                }
             }
         }
     )
@@ -385,9 +464,12 @@ fun StudentListTopBar(
 @Composable
 fun StudentList(
     students: List<Student>,
-    deleteStudent: (Int) -> Unit,
     navigateToUpsert: (Int) -> Unit,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    isLongPressEnabled: Boolean,
+    onLongPressEnabledChange: (Boolean) -> Unit,
+    selectedStudentsForDelete: List<Student>,
+    onStudentSelectForDelete: (Student) -> Unit
 ) {
 
     LazyColumn(
@@ -402,10 +484,13 @@ fun StudentList(
                 student.id
             }
         ) {
-            StudentDismissItem(
+            StudentCard(
                 student = it,
-                deleteStudent = deleteStudent,
-                navigateToUpsert = navigateToUpsert
+                navigateToUpsert = navigateToUpsert,
+                isLongPressEnabled = isLongPressEnabled,
+                isSelected = selectedStudentsForDelete.contains(it),
+                onLongPressEnabledChange = onLongPressEnabledChange,
+                onStudentSelectForDelete = onStudentSelectForDelete
             )
 
         }
@@ -413,80 +498,18 @@ fun StudentList(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun StudentDismissItem(
-    student: Student,
-    deleteStudent: (Int) -> Unit,
-    navigateToUpsert: (Int) -> Unit
-) {
-
-    var show by remember { mutableStateOf(true) }
-    val currentItem by rememberUpdatedState(student)
-    val dismissState = rememberDismissState(
-        confirmValueChange = {
-            if (it == DismissValue.DismissedToEnd) {
-                show = false
-                true
-            } else false
-        }, positionalThreshold = { POSITIONAL_THRESHOLD.dp.toPx() }
-    )
-
-    AnimatedVisibility(
-        show, exit = fadeOut(spring())
-    ) {
-        SwipeToDismiss(
-            state = dismissState,
-            background = {
-                DismissBackground()
-            },
-            dismissContent = {
-                StudentCard(
-                    student = student,
-                    navigateToUpsert = navigateToUpsert
-                )
-            },
-            directions = setOf(
-                DismissDirection.StartToEnd
-            )
-        )
-    }
-
-    LaunchedEffect(show) {
-        if (!show) {
-            delay(DELETING_DELAY)
-            deleteStudent(currentItem.id)
-        }
-    }
-
-}
-
-@Composable
-fun DismissBackground() {
-
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(MaterialTheme.padding.medium, MaterialTheme.padding.small),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        Icon(
-            Icons.Default.Delete,
-            contentDescription = stringResource(R.string.delete_student)
-        )
-
-    }
-}
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StudentCard(
     student: Student,
-    navigateToUpsert: (Int) -> Unit
+    navigateToUpsert: (Int) -> Unit,
+    isLongPressEnabled: Boolean,
+    isSelected: Boolean,
+    onLongPressEnabledChange: (Boolean) -> Unit,
+    onStudentSelectForDelete: (Student) -> Unit
 ) {
     val context = LocalContext.current
+
 
     try {
         context.contentResolver.takePersistableUriPermission(
@@ -499,9 +522,14 @@ fun StudentCard(
 
 
     ListItem(
-        modifier = Modifier.clickable {
-            navigateToUpsert(student.id)
-        },
+        modifier = Modifier
+            .combinedClickable(
+                onClick = {
+                    if (isLongPressEnabled) onStudentSelectForDelete(student)
+                    else navigateToUpsert(student.id)
+                },
+                onLongClick = { onLongPressEnabledChange(true) }
+            ),
         headlineContent = {
             Text(text = student.name)
         },
@@ -511,15 +539,29 @@ fun StudentCard(
 
         },
         leadingContent = {
-            AsyncImage(
-                modifier = Modifier
-                    .size(STUDENT_ICON_SIZE.dp)
-                    .clip(CircleShape),
-                model = student.imageUri.toUri(),
-                error = painterResource(id = R.drawable.avatar_placeholder),
-                contentDescription = stringResource(id = R.string.student_photo),
-                contentScale = ContentScale.Crop
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                if (isLongPressEnabled) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckedChange = null,
+                        modifier = Modifier.padding(end = MaterialTheme.padding.small)
+                    )
+                }
+
+                AsyncImage(
+                    modifier = Modifier
+                        .size(STUDENT_ICON_SIZE.dp)
+                        .clip(CircleShape),
+                    model = student.imageUri.toUri(),
+                    error = painterResource(id = R.drawable.avatar_placeholder),
+                    contentDescription = stringResource(id = R.string.student_photo),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
         },
         trailingContent = {
             Column {
