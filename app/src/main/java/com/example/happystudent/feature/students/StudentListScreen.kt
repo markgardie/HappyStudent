@@ -20,9 +20,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -391,6 +394,10 @@ fun StudentListTopBar(
     onChangeAllStudentsSelected: (Boolean) -> Unit,
 ) {
 
+    var menuExpanded by remember {
+        mutableStateOf(false)
+    }
+
     val context = LocalContext.current
 
     val sendIntent = Intent().apply {
@@ -430,6 +437,33 @@ fun StudentListTopBar(
                         imageVector = Icons.Filled.Share,
                         contentDescription = stringResource(R.string.share_student_list)
                     )
+                }
+
+                IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = stringResource(R.string.more_options),
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(stringResource(R.string.export_data))
+                        },
+                        onClick = { /* TODO */ },
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Text(stringResource(R.string.import_data))
+                        },
+                        onClick = { /* TODO */ },
+                    )
+
                 }
             } else {
                 IconButton(onClick = {

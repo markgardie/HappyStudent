@@ -29,4 +29,7 @@
     <string name="priority_second">Варті уваги</string>
     <string name="priority_third">Задовільно</string>
     <string name="select_all">Обрати все</string>
+    <string name="more_options">Більше опцій</string>
+    <string name="export_data">Експорт</string>
+    <string name="import_data">Імпорт</string>
 </resources>
