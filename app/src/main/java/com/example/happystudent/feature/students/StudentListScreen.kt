@@ -1,6 +1,9 @@
 package com.example.happystudent.feature.students
 
 import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -82,6 +85,7 @@ private const val FAB_ROTATE = 315f
 private const val ONE_STUDENT_FAB_ID = 0
 private const val GROUP_FAB_ID = 1
 private const val STUDENT_ICON_SIZE = 50
+private const val CREATE_FILE_CODE = 1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -162,6 +166,9 @@ fun StudentListScreen(
                         onClearStudentsForDelete = { selectedStudentsForDelete = emptyList() },
                         allStudentsSelected = allStudentsSelected,
                         onChangeAllStudentsSelected = { allStudentsSelected = it },
+                        exportStudents = viewModel::exportStudents,
+                        importStudents = viewModel::importStudents,
+                        students = (uiState as StudentUiState.Success).students
                     )
                 },
                 floatingActionButton = {
@@ -385,6 +392,7 @@ fun GroupChips(
 fun StudentListTopBar(
     onShowBottomSheet: (Boolean) -> Unit,
     shareText: String,
+    students: List<Student>,
     isLongPressEnabled: Boolean,
     onLongPressEnabledChange: (Boolean) -> Unit,
     onClearStudentsForDelete: () -> Unit,
@@ -392,6 +400,8 @@ fun StudentListTopBar(
     deleteStudent: (Int) -> Unit,
     allStudentsSelected: Boolean,
     onChangeAllStudentsSelected: (Boolean) -> Unit,
+    exportStudents: (List<Student>, Uri) -> Unit,
+    importStudents: (Uri) -> Unit
 ) {
 
     var menuExpanded by remember {
@@ -400,12 +410,26 @@ fun StudentListTopBar(
 
     val context = LocalContext.current
 
+
     val sendIntent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(Intent.EXTRA_TEXT, shareText)
         type = "text/plain"
     }
+
+
+    var exportFileUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = CreateDocument("application/json"),
+        onResult = { exportFileUri = it }
+    )
+
+
     val shareIntent = Intent.createChooser(sendIntent, null)
+
 
     TopAppBar(
         title = {
@@ -455,13 +479,16 @@ fun StudentListTopBar(
                         text = {
                             Text(stringResource(R.string.export_data))
                         },
-                        onClick = { /* TODO */ },
+                        onClick = {
+                            exportLauncher.launch("exported_students.json")
+                            exportFileUri?.let { exportStudents(students, it) }
+                        },
                     )
                     DropdownMenuItem(
                         text = {
                             Text(stringResource(R.string.import_data))
                         },
-                        onClick = { /* TODO */ },
+                        onClick = { TODO() },
                     )
 
                 }

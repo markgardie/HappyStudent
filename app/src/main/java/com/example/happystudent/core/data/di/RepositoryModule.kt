@@ -1,12 +1,15 @@
 package com.example.happystudent.core.data.di
 
+import android.content.Context
 import com.example.happystudent.core.data.repository.StudentRepository
 import com.example.happystudent.core.data.repository.SurveyItemRepository
 import com.example.happystudent.core.data.repository_impl.OfflineFirstStudentRepository
 import com.example.happystudent.core.data.repository_impl.TestSurveyItemRepository
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
 
@@ -21,14 +24,19 @@ annotation class TestRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface RepositoryModule {
+abstract class RepositoryModule {
 
    @OfflineFirstRepository
    @Binds
-   fun bindOfflineStudentRepository(impl: OfflineFirstStudentRepository): StudentRepository
+   abstract fun bindOfflineStudentRepository(impl: OfflineFirstStudentRepository): StudentRepository
+
+   @OfflineFirstRepository
+   @Provides
+   fun provideContentResolver(@ApplicationContext applicationContext: Context) =
+      applicationContext.contentResolver
 
    @TestRepository
    @Binds
-   fun bindTestSurveyItemRepository(impl: TestSurveyItemRepository): SurveyItemRepository
+   abstract fun bindTestSurveyItemRepository(impl: TestSurveyItemRepository): SurveyItemRepository
 
 }

@@ -1,5 +1,6 @@
 package com.example.happystudent.feature.students
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.happystudent.core.data.di.OfflineFirstRepository
@@ -119,7 +120,17 @@ class StudentViewModel @Inject constructor(
         .keys
         .toList()
 
+    fun exportStudents(students: List<Student>, jsonUri: Uri) {
+        viewModelScope.launch {
+            repository.exportStudents(students, jsonUri)
+        }
+    }
 
+    fun importStudents(jsonUri: Uri) {
+        viewModelScope.launch {
+            repository.importStudents(jsonUri)
+        }
+    }
 }
 
 sealed interface StudentUiState {
