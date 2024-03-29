@@ -12,7 +12,7 @@ interface StudentRepository {
 
     suspend fun deleteStudent(studentId: Int)
 
-    suspend fun exportStudents(students: List<Student>, jsonUri: Uri)
+    suspend fun exportStudents(students: List<Student>)
 
     suspend fun importStudents(jsonUri: Uri)
 }

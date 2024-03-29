@@ -120,9 +120,9 @@ class StudentViewModel @Inject constructor(
         .keys
         .toList()
 
-    fun exportStudents(students: List<Student>, jsonUri: Uri) {
+    fun exportStudents(students: List<Student>) {
         viewModelScope.launch {
-            repository.exportStudents(students, jsonUri)
+            repository.exportStudents(students)
         }
     }
 

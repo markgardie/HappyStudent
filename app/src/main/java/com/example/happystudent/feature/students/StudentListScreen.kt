@@ -48,6 +48,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,7 +86,6 @@ private const val FAB_ROTATE = 315f
 private const val ONE_STUDENT_FAB_ID = 0
 private const val GROUP_FAB_ID = 1
 private const val STUDENT_ICON_SIZE = 50
-private const val CREATE_FILE_CODE = 1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -400,7 +400,7 @@ fun StudentListTopBar(
     deleteStudent: (Int) -> Unit,
     allStudentsSelected: Boolean,
     onChangeAllStudentsSelected: (Boolean) -> Unit,
-    exportStudents: (List<Student>, Uri) -> Unit,
+    exportStudents: (List<Student>) -> Unit,
     importStudents: (Uri) -> Unit
 ) {
 
@@ -418,13 +418,13 @@ fun StudentListTopBar(
     }
 
 
-    var exportFileUri by remember {
+    var exportFileUri by rememberSaveable {
         mutableStateOf<Uri?>(null)
     }
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = CreateDocument("application/json"),
-        onResult = { exportFileUri = it }
+        onResult = { uri -> exportFileUri = uri }
     )
 
 
@@ -480,8 +480,7 @@ fun StudentListTopBar(
                             Text(stringResource(R.string.export_data))
                         },
                         onClick = {
-                            exportLauncher.launch("exported_students.json")
-                            exportFileUri?.let { exportStudents(students, it) }
+                            exportStudents(students)
                         },
                     )
                     DropdownMenuItem(
