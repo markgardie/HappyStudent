@@ -32,4 +32,6 @@
     <string name="more_options">More</string>
     <string name="export_data">Export</string>
     <string name="import_data">Import</string>
+    <string name="successful_export">Successfully exported to Downloads</string>
+    <string name="error_export">Error while exporting</string>
 </resources>

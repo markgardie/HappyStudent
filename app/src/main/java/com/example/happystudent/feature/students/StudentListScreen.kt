@@ -39,6 +39,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -48,6 +50,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80,6 +83,7 @@ import com.example.happystudent.core.theme.components.MultiFloatingActionButton
 import com.example.happystudent.core.theme.components.rememberMultiFabState
 import com.example.happystudent.core.theme.padding
 import com.example.happystudent.feature.students.util.formatList
+import kotlinx.coroutines.launch
 
 
 private const val FAB_ROTATE = 315f
@@ -121,8 +125,7 @@ fun StudentListScreen(
         mutableStateOf(false)
     }
 
-
-
+    val snackbarHostState = remember { SnackbarHostState() }
 
     when (uiState) {
 
@@ -146,6 +149,9 @@ fun StudentListScreen(
             }
 
             Scaffold(
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState)
+                },
                 topBar = {
                     StudentListTopBar(
                         onShowBottomSheet = { show ->
@@ -168,7 +174,8 @@ fun StudentListScreen(
                         onChangeAllStudentsSelected = { allStudentsSelected = it },
                         exportStudents = viewModel::exportStudents,
                         importStudents = viewModel::importStudents,
-                        students = (uiState as StudentUiState.Success).students
+                        students = (uiState as StudentUiState.Success).students,
+                        snackbarHostState = snackbarHostState
                     )
                 },
                 floatingActionButton = {
@@ -401,7 +408,8 @@ fun StudentListTopBar(
     allStudentsSelected: Boolean,
     onChangeAllStudentsSelected: (Boolean) -> Unit,
     exportStudents: (List<Student>) -> Unit,
-    importStudents: (Uri) -> Unit
+    importStudents: (Uri) -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
 
     var menuExpanded by remember {
@@ -427,9 +435,11 @@ fun StudentListTopBar(
         onResult = { uri -> exportFileUri = uri }
     )
 
-
     val shareIntent = Intent.createChooser(sendIntent, null)
 
+    val snackbarScope = rememberCoroutineScope()
+
+    val snackbarSuccessExport = stringResource(R.string.successful_export)
 
     TopAppBar(
         title = {
@@ -481,6 +491,9 @@ fun StudentListTopBar(
                         },
                         onClick = {
                             exportStudents(students)
+                            snackbarScope.launch {
+                                snackbarHostState.showSnackbar(snackbarSuccessExport)
+                            }
                         },
                     )
                     DropdownMenuItem(
