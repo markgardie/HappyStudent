@@ -13,6 +13,7 @@ import com.example.happystudent.core.model.Student.Companion.CRITICAL_PROB
 import com.example.happystudent.core.model.Student.Companion.IMPORTANT_PROB
 import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -120,16 +121,19 @@ class StudentViewModel @Inject constructor(
         .keys
         .toList()
 
-    fun exportStudents(students: List<Student>, uri: Uri) {
-        viewModelScope.launch {
+    suspend fun exportStudents(students: List<Student>, uri: Uri): Int {
+
+        val deferredJob = viewModelScope.async {
             repository.exportStudents(students, uri)
         }
+        return deferredJob.await()
     }
 
-    fun importStudents(uri: Uri) {
-        viewModelScope.launch {
+    suspend fun importStudents(uri: Uri): Int {
+        val deferredJob = viewModelScope.async {
             repository.importStudents(uri)
         }
+        return deferredJob.await()
     }
 }
 

@@ -32,6 +32,9 @@
     <string name="more_options">Більше опцій</string>
     <string name="export_data">Експорт</string>
     <string name="import_data">Імпорт</string>
-    <string name="successful_export">Успішно експортовано в завантаження</string>
+    <string name="successful_export">Успішно експортовано</string>
     <string name="error_export">При експорті виникла помилка</string>
+    <string name="failed_export">Виникла помилка при експорті</string>
+    <string name="import_success">Успішно імпортовано</string>
+    <string name="import_failure">При імпорті виникли помилки</string>
 </resources>

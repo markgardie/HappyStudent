@@ -49,6 +49,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -66,6 +67,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.happystudent.R
+import com.example.happystudent.core.data.repository_impl.SUCCESS_EXPORT_IMPORT
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.datastore.FilterPreferences.Priority
 import com.example.happystudent.core.model.Student
@@ -82,6 +84,7 @@ import com.example.happystudent.core.theme.components.MultiFloatingActionButton
 import com.example.happystudent.core.theme.components.rememberMultiFabState
 import com.example.happystudent.core.theme.padding
 import com.example.happystudent.feature.students.util.formatList
+import kotlinx.coroutines.launch
 
 
 private const val FAB_ROTATE = 315f
@@ -424,11 +427,13 @@ fun StudentListTopBar(
     deleteStudent: (Int) -> Unit,
     allStudentsSelected: Boolean,
     onChangeAllStudentsSelected: (Boolean) -> Unit,
-    exportStudents: (List<Student>, Uri) -> Unit,
-    importStudents: (Uri) -> Unit,
+    exportStudents: suspend (List<Student>, Uri) -> Int,
+    importStudents: suspend (Uri) -> Int,
     snackbarHostState: SnackbarHostState,
     showFilterButton: Boolean,
 ) {
+
+    val scope = rememberCoroutineScope()
 
     var menuExpanded by remember {
         mutableStateOf(false)
@@ -443,13 +448,27 @@ fun StudentListTopBar(
         type = "text/plain"
     }
 
+    var exportResult by remember {
+        mutableIntStateOf(0)
+    }
 
+    val snackbarSuccessExport = stringResource(R.string.successful_export)
+    val snackbarFailedExport = stringResource(R.string.failed_export)
+    val snackbarSuccessImport = stringResource(R.string.import_success)
+    val snackbarFailedImport = stringResource(R.string.import_failure)
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = CreateDocument("application/json"),
         onResult = { uri ->
             uri?.let {
-                exportStudents(students, uri)
+                scope.launch {
+                    exportResult = exportStudents(students, uri)
+                    if (exportResult == SUCCESS_EXPORT_IMPORT) {
+                        snackbarHostState.showSnackbar(snackbarSuccessExport)
+                    } else {
+                        snackbarHostState.showSnackbar(snackbarFailedExport)
+                    }
+                }
             }
         }
     )
@@ -459,7 +478,15 @@ fun StudentListTopBar(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri ->
             uri?.let {
-                importStudents(uri)
+                scope.launch {
+                    val importResult = importStudents(uri)
+                    if (importResult == SUCCESS_EXPORT_IMPORT) {
+                        snackbarHostState.showSnackbar(snackbarSuccessImport)
+                    } else {
+                        snackbarHostState.showSnackbar(snackbarFailedImport)
+                    }
+                }
+
             }
         }
     )
@@ -467,9 +494,6 @@ fun StudentListTopBar(
 
     val shareIntent = Intent.createChooser(sendIntent, null)
 
-    val snackbarScope = rememberCoroutineScope()
-
-    val snackbarSuccessExport = stringResource(R.string.successful_export)
 
     TopAppBar(
         title = {

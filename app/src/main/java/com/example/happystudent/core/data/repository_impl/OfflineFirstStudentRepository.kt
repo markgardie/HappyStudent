@@ -17,6 +17,10 @@ import java.io.FileOutputStream
 import java.io.InputStreamReader
 import javax.inject.Inject
 
+
+const val SUCCESS_EXPORT_IMPORT = 1
+const val FAILED_EXPORT_IMPORT = 0
+
 class OfflineFirstStudentRepository @Inject constructor(
     private val studentDao: StudentDao,
     @ApplicationContext private val context: Context
@@ -36,31 +40,44 @@ class OfflineFirstStudentRepository @Inject constructor(
         studentDao.deleteStudent(studentId)
     }
 
-    override suspend fun exportStudents(students: List<Student>, uri: Uri) {
+    override suspend fun exportStudents(students: List<Student>, uri: Uri): Int {
         val studentsJson = Json.encodeToString(students)
 
-        context.contentResolver.openFileDescriptor(uri, "w")?.use { descriptor ->
-            FileOutputStream(descriptor.fileDescriptor).use { outputStream ->
-                outputStream.write(studentsJson.toByteArray())
-            }
-        }
-    }
-
-    override suspend fun importStudents(uri: Uri) {
-
-        val stringBuilder = StringBuilder()
-        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                var line: String? = reader.readLine()
-                while (line != null) {
-                    stringBuilder.append(line)
-                    line = reader.readLine()
+        return try {
+            context.contentResolver.openFileDescriptor(uri, "w")?.use { descriptor ->
+                FileOutputStream(descriptor.fileDescriptor).use { outputStream ->
+                    outputStream.write(studentsJson.toByteArray())
                 }
             }
+
+            SUCCESS_EXPORT_IMPORT
+        } catch(e: Exception) {
+            FAILED_EXPORT_IMPORT
         }
-        val studentsJson = stringBuilder.toString()
-        Json.decodeFromString<List<Student>>(studentsJson).forEach {
-            studentDao.upsertStudent(it.asEntity())
+
+    }
+
+    override suspend fun importStudents(uri: Uri): Int {
+
+        val stringBuilder = StringBuilder()
+
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                    var line: String? = reader.readLine()
+                    while (line != null) {
+                        stringBuilder.append(line)
+                        line = reader.readLine()
+                    }
+                }
+            }
+            val studentsJson = stringBuilder.toString()
+            Json.decodeFromString<List<Student>>(studentsJson).forEach {
+                studentDao.upsertStudent(it.asEntity())
+            }
+            SUCCESS_EXPORT_IMPORT
+        } catch (e: Exception) {
+            FAILED_EXPORT_IMPORT
         }
 
     }
