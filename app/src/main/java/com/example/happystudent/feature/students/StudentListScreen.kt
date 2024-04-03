@@ -52,7 +52,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,7 +82,6 @@ import com.example.happystudent.core.theme.components.MultiFloatingActionButton
 import com.example.happystudent.core.theme.components.rememberMultiFabState
 import com.example.happystudent.core.theme.padding
 import com.example.happystudent.feature.students.util.formatList
-import kotlinx.coroutines.launch
 
 
 private const val FAB_ROTATE = 315f
@@ -426,10 +424,10 @@ fun StudentListTopBar(
     deleteStudent: (Int) -> Unit,
     allStudentsSelected: Boolean,
     onChangeAllStudentsSelected: (Boolean) -> Unit,
-    exportStudents: (List<Student>) -> Unit,
+    exportStudents: (List<Student>, Uri) -> Unit,
     importStudents: (Uri) -> Unit,
     snackbarHostState: SnackbarHostState,
-    showFilterButton: Boolean
+    showFilterButton: Boolean,
 ) {
 
     var menuExpanded by remember {
@@ -446,23 +444,26 @@ fun StudentListTopBar(
     }
 
 
-    var exportFileUri by rememberSaveable {
-        mutableStateOf<Uri?>(null)
-    }
-
-    var importFileUri by rememberSaveable {
-        mutableStateOf<Uri?>(null)
-    }
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = CreateDocument("application/json"),
-        onResult = { uri -> exportFileUri = uri }
+        onResult = { uri ->
+            uri?.let {
+                exportStudents(students, uri)
+            }
+        }
     )
+
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
-        onResult = { uri -> importFileUri = uri }
+        onResult = { uri ->
+            uri?.let {
+                importStudents(uri)
+            }
+        }
     )
+
 
     val shareIntent = Intent.createChooser(sendIntent, null)
 
@@ -521,10 +522,7 @@ fun StudentListTopBar(
                             Text(stringResource(R.string.export_data))
                         },
                         onClick = {
-                            exportStudents(students)
-                            snackbarScope.launch {
-                                snackbarHostState.showSnackbar(snackbarSuccessExport)
-                            }
+                            exportLauncher.launch("exported-students.json")
                         },
                     )
                     DropdownMenuItem(
@@ -533,7 +531,6 @@ fun StudentListTopBar(
                         },
                         onClick = {
                             importLauncher.launch(arrayOf("application/json"))
-                            importFileUri?.let { importStudents(it) }
                         },
                     )
 

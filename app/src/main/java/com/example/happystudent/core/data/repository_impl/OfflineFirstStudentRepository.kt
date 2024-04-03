@@ -1,28 +1,25 @@
 package com.example.happystudent.core.data.repository_impl
 
+import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import com.example.happystudent.core.data.repository.StudentRepository
 import com.example.happystudent.core.database.asEntity
 import com.example.happystudent.core.database.asExternalModel
 import com.example.happystudent.core.database.dao.StudentDao
 import com.example.happystudent.core.database.model.StudentEntity
 import com.example.happystudent.core.model.Student
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
-import java.io.FileInputStream
+import java.io.BufferedReader
 import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.io.InputStreamReader
 import javax.inject.Inject
 
 class OfflineFirstStudentRepository @Inject constructor(
-    private val studentDao: StudentDao
+    private val studentDao: StudentDao,
+    @ApplicationContext private val context: Context
 ) : StudentRepository {
 
 
@@ -39,37 +36,32 @@ class OfflineFirstStudentRepository @Inject constructor(
         studentDao.deleteStudent(studentId)
     }
 
-    override suspend fun exportStudents(students: List<Student>) {
+    override suspend fun exportStudents(students: List<Student>, uri: Uri) {
         val studentsJson = Json.encodeToString(students)
 
-        val downloadFolder =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val timestamp = SimpleDateFormat("dd-MM-yyyy HH-mm-ss", Locale.getDefault())
-            .format(Calendar.getInstance().time)
-
-
-        val file = File("${downloadFolder?.path}/$timestamp.json")
-
-        withContext(Dispatchers.IO) {
-            FileOutputStream(file).use { outputStream ->
+        context.contentResolver.openFileDescriptor(uri, "w")?.use { descriptor ->
+            FileOutputStream(descriptor.fileDescriptor).use { outputStream ->
                 outputStream.write(studentsJson.toByteArray())
             }
         }
     }
 
-    override suspend fun importStudents(jsonUri: Uri) {
+    override suspend fun importStudents(uri: Uri) {
 
-        withContext(Dispatchers.IO) {
-            FileInputStream(jsonUri.toString()).use { inputStream ->
-                val studentsJson = inputStream.readBytes().toString()
-                val students = Json.decodeFromString<List<Student>>(studentsJson)
-                students.forEach { student ->
-                    studentDao.upsertStudent(student.asEntity())
+        val stringBuilder = StringBuilder()
+        context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    stringBuilder.append(line)
+                    line = reader.readLine()
                 }
             }
-
         }
-
+        val studentsJson = stringBuilder.toString()
+        Json.decodeFromString<List<Student>>(studentsJson).forEach {
+            studentDao.upsertStudent(it.asEntity())
+        }
 
     }
 
