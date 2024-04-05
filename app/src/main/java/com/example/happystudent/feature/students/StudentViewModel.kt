@@ -1,5 +1,6 @@
 package com.example.happystudent.feature.students
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.happystudent.core.data.di.OfflineFirstRepository
@@ -12,6 +13,7 @@ import com.example.happystudent.core.model.Student.Companion.CRITICAL_PROB
 import com.example.happystudent.core.model.Student.Companion.IMPORTANT_PROB
 import com.example.happystudent.core.model.Student.Companion.ZERO_PROB
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -119,7 +121,20 @@ class StudentViewModel @Inject constructor(
         .keys
         .toList()
 
+    suspend fun exportStudents(students: List<Student>, uri: Uri): Int {
 
+        val deferredJob = viewModelScope.async {
+            repository.exportStudents(students, uri)
+        }
+        return deferredJob.await()
+    }
+
+    suspend fun importStudents(uri: Uri): Int {
+        val deferredJob = viewModelScope.async {
+            repository.importStudents(uri)
+        }
+        return deferredJob.await()
+    }
 }
 
 sealed interface StudentUiState {

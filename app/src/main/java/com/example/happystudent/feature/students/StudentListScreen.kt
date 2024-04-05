@@ -1,6 +1,10 @@
 package com.example.happystudent.feature.students
 
 import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -20,9 +24,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -33,6 +40,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -40,8 +49,10 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +67,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.happystudent.R
+import com.example.happystudent.core.data.repository_impl.SUCCESS_EXPORT_IMPORT
 import com.example.happystudent.core.datastore.FilterPreferences.FilterType
 import com.example.happystudent.core.datastore.FilterPreferences.Priority
 import com.example.happystudent.core.model.Student
@@ -68,11 +80,11 @@ import com.example.happystudent.core.theme.PurpleGrey40
 import com.example.happystudent.core.theme.Red40
 import com.example.happystudent.core.theme.Yellow60
 import com.example.happystudent.core.theme.components.FabItem
-import com.example.happystudent.core.theme.components.MultiFabState
 import com.example.happystudent.core.theme.components.MultiFloatingActionButton
 import com.example.happystudent.core.theme.components.rememberMultiFabState
 import com.example.happystudent.core.theme.padding
 import com.example.happystudent.feature.students.util.formatList
+import kotlinx.coroutines.launch
 
 
 private const val FAB_ROTATE = 315f
@@ -114,74 +126,101 @@ fun StudentListScreen(
         mutableStateOf(false)
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    var shareText by remember {
+        mutableStateOf("")
+    }
+
+    var students by remember {
+        mutableStateOf(emptyList<Student>())
+    }
+
+    var showFilterButton by remember {
+        mutableStateOf(false)
+    }
 
 
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        topBar = {
 
-    when (uiState) {
+            StudentListTopBar(
+                onShowBottomSheet = { show ->
+                    showBottomSheet = show
+                },
+                shareText = shareText,
+                isLongPressEnabled = isLongPressEnabled,
+                onLongPressEnabledChange = onLongPressEnabledChange,
+                selectedStudentsForDelete = selectedStudentsForDelete,
+                deleteStudent = viewModel::deleteStudent,
+                onClearStudentsForDelete = { selectedStudentsForDelete = emptyList() },
+                allStudentsSelected = allStudentsSelected,
+                onChangeAllStudentsSelected = { allStudentsSelected = it },
+                exportStudents = viewModel::exportStudents,
+                importStudents = viewModel::importStudents,
+                students = students,
+                snackbarHostState = snackbarHostState,
+                showFilterButton = showFilterButton
+            )
+        },
+        floatingActionButton = {
 
-        is StudentUiState.Empty -> EmptyState(
-            navigateToUpsert = navigateToUpsert,
-            multiFabState = multiFabState,
-            fabItems = fabItems,
-            onStateChanged = { multiFabState = it },
-            navigateToBatch = navigateToBatch
-        )
+            MultiFloatingActionButton(
+                state = multiFabState,
+                onStateChange = {
+                    multiFabState = it
+                },
+                mainIconRes = R.drawable.ic_add,
+                rotateDegree = FAB_ROTATE,
+                fabItems = fabItems,
+                onItemClicked = { fabItem ->
+                    if (fabItem.id == ONE_STUDENT_FAB_ID) {
+                        navigateToUpsert(UNDEFINED_ID)
+                    } else {
+                        navigateToBatch()
+                    }
+                }
+            )
 
-        is StudentUiState.Loading -> LoadingState(navigateToUpsert = navigateToUpsert)
-        is StudentUiState.Success -> {
+        }
+    ) { innerPadding ->
 
-            LaunchedEffect(key1 = allStudentsSelected) {
-                selectedStudentsForDelete =
-                    if (allStudentsSelected)
-                        selectedStudentsForDelete.plus((uiState as StudentUiState.Success).students)
-                    else
-                        selectedStudentsForDelete.minus((uiState as StudentUiState.Success).students.toSet())
+        when (uiState) {
+
+            is StudentUiState.Empty -> {
+                shareText = ""
+                students = emptyList()
+                showFilterButton = false
+                EmptyState(innerPadding = innerPadding)
             }
 
-            Scaffold(
-                topBar = {
-                    StudentListTopBar(
-                        onShowBottomSheet = { show ->
-                            showBottomSheet = show
-                        },
-                        shareText = viewModel
-                            .filterStudents(
-                                (uiState as StudentUiState.Success).students,
-                                (uiState as StudentUiState.Success).filterType,
-                                (uiState as StudentUiState.Success).preferenceGroup,
-                                (uiState as StudentUiState.Success).preferencePriority
-                            )
-                            .formatList(),
-                        isLongPressEnabled = isLongPressEnabled,
-                        onLongPressEnabledChange = onLongPressEnabledChange,
-                        selectedStudentsForDelete = selectedStudentsForDelete,
-                        deleteStudent = viewModel::deleteStudent,
-                        onClearStudentsForDelete = { selectedStudentsForDelete = emptyList() },
-                        allStudentsSelected = allStudentsSelected,
-                        onChangeAllStudentsSelected = { allStudentsSelected = it },
-                    )
-                },
-                floatingActionButton = {
+            is StudentUiState.Loading -> LoadingState(navigateToUpsert = navigateToUpsert)
+            is StudentUiState.Success -> {
 
-                    MultiFloatingActionButton(
-                        state = multiFabState,
-                        onStateChange = {
-                            multiFabState = it
-                        },
-                        mainIconRes = R.drawable.ic_add,
-                        rotateDegree = FAB_ROTATE,
-                        fabItems = fabItems,
-                        onItemClicked = { fabItem ->
-                            if (fabItem.id == ONE_STUDENT_FAB_ID) {
-                                navigateToUpsert(UNDEFINED_ID)
-                            } else {
-                                navigateToBatch()
-                            }
-                        }
-                    )
+                shareText =
+                    viewModel
+                        .filterStudents(
+                            (uiState as StudentUiState.Success).students,
+                            (uiState as StudentUiState.Success).filterType,
+                            (uiState as StudentUiState.Success).preferenceGroup,
+                            (uiState as StudentUiState.Success).preferencePriority
+                        )
+                        .formatList()
+                students = (uiState as StudentUiState.Success).students
 
+                showFilterButton = true
+
+                LaunchedEffect(key1 = allStudentsSelected) {
+                    selectedStudentsForDelete =
+                        if (allStudentsSelected)
+                            selectedStudentsForDelete.plus((uiState as StudentUiState.Success).students)
+                        else
+                            selectedStudentsForDelete.minus((uiState as StudentUiState.Success).students.toSet())
                 }
-            ) { innerPadding ->
+
                 FilterBottomSheet(
                     sheetState = sheetState,
                     showBottomState = showBottomSheet,
@@ -193,7 +232,6 @@ fun StudentListScreen(
                     preferencePriority = (uiState as StudentUiState.Success).preferencePriority,
                     onUpdateFilterPreferences = viewModel::updateFilterPreferences
                 )
-
 
                 StudentList(
                     students = viewModel.filterStudents(
@@ -217,7 +255,6 @@ fun StudentListScreen(
                     }
                 )
             }
-
 
         }
 
@@ -382,6 +419,7 @@ fun GroupChips(
 fun StudentListTopBar(
     onShowBottomSheet: (Boolean) -> Unit,
     shareText: String,
+    students: List<Student>,
     isLongPressEnabled: Boolean,
     onLongPressEnabledChange: (Boolean) -> Unit,
     onClearStudentsForDelete: () -> Unit,
@@ -389,16 +427,73 @@ fun StudentListTopBar(
     deleteStudent: (Int) -> Unit,
     allStudentsSelected: Boolean,
     onChangeAllStudentsSelected: (Boolean) -> Unit,
+    exportStudents: suspend (List<Student>, Uri) -> Int,
+    importStudents: suspend (Uri) -> Int,
+    snackbarHostState: SnackbarHostState,
+    showFilterButton: Boolean,
 ) {
 
+    val scope = rememberCoroutineScope()
+
+    var menuExpanded by remember {
+        mutableStateOf(false)
+    }
+
     val context = LocalContext.current
+
 
     val sendIntent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(Intent.EXTRA_TEXT, shareText)
         type = "text/plain"
     }
+
+    var exportResult by remember {
+        mutableIntStateOf(0)
+    }
+
+    val snackbarSuccessExport = stringResource(R.string.successful_export)
+    val snackbarFailedExport = stringResource(R.string.failed_export)
+    val snackbarSuccessImport = stringResource(R.string.import_success)
+    val snackbarFailedImport = stringResource(R.string.import_failure)
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = CreateDocument("application/json"),
+        onResult = { uri ->
+            uri?.let {
+                scope.launch {
+                    exportResult = exportStudents(students, uri)
+                    if (exportResult == SUCCESS_EXPORT_IMPORT) {
+                        snackbarHostState.showSnackbar(snackbarSuccessExport)
+                    } else {
+                        snackbarHostState.showSnackbar(snackbarFailedExport)
+                    }
+                }
+            }
+        }
+    )
+
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            uri?.let {
+                scope.launch {
+                    val importResult = importStudents(uri)
+                    if (importResult == SUCCESS_EXPORT_IMPORT) {
+                        snackbarHostState.showSnackbar(snackbarSuccessImport)
+                    } else {
+                        snackbarHostState.showSnackbar(snackbarFailedImport)
+                    }
+                }
+
+            }
+        }
+    )
+
+
     val shareIntent = Intent.createChooser(sendIntent, null)
+
 
     TopAppBar(
         title = {
@@ -419,17 +514,50 @@ fun StudentListTopBar(
         },
         actions = {
             if (!isLongPressEnabled) {
-                IconButton(onClick = { onShowBottomSheet(true) }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_filter),
-                        contentDescription = stringResource(R.string.student_filter)
-                    )
+                if (showFilterButton) {
+                    IconButton(onClick = { onShowBottomSheet(true) }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_filter),
+                            contentDescription = stringResource(R.string.student_filter)
+                        )
+                    }
                 }
                 IconButton(onClick = { startActivity(context, shareIntent, null) }) {
                     Icon(
                         imageVector = Icons.Filled.Share,
                         contentDescription = stringResource(R.string.share_student_list)
                     )
+                }
+
+                IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = stringResource(R.string.more_options),
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(stringResource(R.string.export_data))
+                        },
+                        onClick = {
+                            exportLauncher.launch("exported-students.json")
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Text(stringResource(R.string.import_data))
+                        },
+                        onClick = {
+                            importLauncher.launch(arrayOf("application/json"))
+                        },
+                    )
+
                 }
             } else {
                 IconButton(onClick = {
@@ -621,41 +749,19 @@ fun LoadingState(
 
 @Composable
 fun EmptyState(
-    navigateToUpsert: (Int) -> Unit,
-    navigateToBatch: () -> Unit,
-    multiFabState: MultiFabState,
-    fabItems: List<FabItem>,
-    onStateChanged: (MultiFabState) -> Unit
+    innerPadding: PaddingValues
 ) {
 
-    Scaffold(
-        floatingActionButton = {
-            MultiFloatingActionButton(
-                state = multiFabState,
-                onStateChange = {
-                    onStateChanged(it)
-                },
-                mainIconRes = R.drawable.ic_add,
-                rotateDegree = FAB_ROTATE,
-                fabItems = fabItems,
-                onItemClicked = { fabItem ->
-                    if (fabItem.id == ONE_STUDENT_FAB_ID) navigateToUpsert(UNDEFINED_ID)
-                    else navigateToBatch()
-                }
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
 
-            Text(text = stringResource(R.string.empty_student_list))
+        Text(text = stringResource(R.string.empty_student_list))
 
-        }
     }
 
 

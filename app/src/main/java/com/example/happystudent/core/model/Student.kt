@@ -1,7 +1,9 @@
 package com.example.happystudent.core.model
 
 import com.example.happystudent.core.datastore.FilterPreferences
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Student(
     val id: Int = UNDEFINED_ID,
     val name: String,
