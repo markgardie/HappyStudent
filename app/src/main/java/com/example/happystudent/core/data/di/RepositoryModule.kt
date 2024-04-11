@@ -21,14 +21,14 @@ annotation class TestRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface RepositoryModule {
+abstract class RepositoryModule {
 
    @OfflineFirstRepository
    @Binds
-   fun bindOfflineStudentRepository(impl: OfflineFirstStudentRepository): StudentRepository
+   abstract fun bindOfflineStudentRepository(impl: OfflineFirstStudentRepository): StudentRepository
 
    @TestRepository
    @Binds
-   fun bindTestSurveyItemRepository(impl: TestSurveyItemRepository): SurveyItemRepository
+   abstract fun bindTestSurveyItemRepository(impl: TestSurveyItemRepository): SurveyItemRepository
 
 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.happystudent.R
 import com.example.happystudent.core.model.SurveyItem
@@ -176,7 +177,8 @@ fun SurveyItemComponent(
 
         Text(
             text = surveyItem.question,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
         )
 
         Column(
