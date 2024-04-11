@@ -16,8 +16,8 @@ android {
         applicationId "com.example.happystudent"
         minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName "0.4"
+        versionCode 2
+        versionName "0.4.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -28,8 +28,8 @@ android {
     buildTypes {
         release {
             debuggable  false
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -77,10 +77,9 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
 
     // Navigation
-    implementation "androidx.navigation:navigation-fragment-ktx:2.7.6"
-    implementation "androidx.navigation:navigation-ui-ktx:2.7.6"
-    implementation "androidx.navigation:navigation-compose:2.7.6"
-    implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
+    implementation "androidx.navigation:navigation-ui-ktx:2.7.7"
+    implementation "androidx.navigation:navigation-compose:2.7.7"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
 
     // Coil
     implementation("io.coil-kt:coil:2.4.0")
@@ -110,7 +109,7 @@ dependencies {
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation 'androidx.compose.material3:material3:1.1.2'
+    implementation 'androidx.compose.material3:material3:1.2.1'
 
     // Testing
     testImplementation 'junit:junit:4.13.2'
