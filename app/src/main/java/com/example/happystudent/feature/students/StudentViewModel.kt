@@ -72,7 +72,7 @@ class StudentViewModel @Inject constructor(
     ) {
 
         studentListString
-            .split(",\\s+|\\s+,\\s+|\\s+|,".toRegex())
+            .split(",\\s+|\\s+,\\s+|\\s+,|,|\\n".toRegex())
             .forEach {
                 upsertStudent(
                     Student(
